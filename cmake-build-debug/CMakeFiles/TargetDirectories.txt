@@ -1,0 +1,3 @@
+/home/coldus/CLionProjects/nagyHF/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/coldus/CLionProjects/nagyHF/cmake-build-debug/CMakeFiles/nagyHF.dir
+/home/coldus/CLionProjects/nagyHF/cmake-build-debug/CMakeFiles/edit_cache.dir
