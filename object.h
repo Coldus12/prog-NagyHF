@@ -24,8 +24,14 @@ void free_triangle_array(triangle_array* din_array);
 
 //-----------------------------------------------------------------
 
-typedef struct Object{triangle_array triangleArray} Object;
-//void free_object(Object* obj);
-void load_object_from_file(char* filename, Object *obj);
+typedef struct Model{triangle_array triangleArray} Model;
+void free_model(Model *mod);
+void load_model_from_file(char* filename, Model *mod);
+
+//-----------------------------------------------------------------
+
+typedef struct Object{Model model; Point location; double angle_from_z_axis; double angle_from_x_axis} Object;
+void move_Object_to_Point(Object *obj, Point point);
+void load_Model_into_Object(Object *obj, Model model);
 
 #endif //NAGYHF_OBJECT_H

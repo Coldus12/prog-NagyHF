@@ -10,6 +10,10 @@
 typedef struct triangle{Point p1; Point p2; Point p3} triangle;
 typedef struct din_point_array{Point* points; int size} din_point_array;
 typedef struct din_triangle_array{triangle* triangles; int size} triangle_array;
+typedef struct Model{triangle_array triangleArray} Model;
+typedef struct Object{Model model; Point location; double angle_from_z_axis; double angle_from_x_axis} Object;
+
+//typedef struct legalObject{triangle_array tri_array; Point location} legalObject;
 
 void init_point_array(din_point_array* din_array, int size) {
     din_array->points = (Point*) calloc(size, sizeof(Point));
@@ -63,13 +67,11 @@ void free_triangle_array(triangle_array* din_array) {
 
 //----------------------------------------------------------------
 
-typedef struct Object{triangle_array triangleArray} Object;
-
-void free_object(Object* obj) {
-    free(obj);
+void free_model(Model *mod) {
+    free(mod->triangleArray.triangles);
 }
 
-void load_object_from_file(char *filename, Object *obj) {
+void load_model_from_file(char *filename, Model *mod) {
     //Haromszogek
     triangle_array tri_array;
     init_triangle_array(&tri_array, 0);
@@ -113,11 +115,91 @@ void load_object_from_file(char *filename, Object *obj) {
         }
     }
 
-    obj->triangleArray.triangles = tri_array.triangles;
+    init_triangle_array(&mod->triangleArray,tri_array.size);
+    for (int i = 0; i < tri_array.size; i++) {
+        mod->triangleArray.triangles[i] = tri_array.triangles[i];
+    }
+    //obj->triangleArray.triangles = tri_array.triangles;
 
     fclose(fp);
     free_triangle_array(&tri_array);
     free_point_array(&pArray);
+}
+
+/*
+void load_model_into_object(Object *obj, Model *mod) {
+    init_triangle_array(&obj->triangleArray, mod->triangleArray.size);
+
+    for (int i = 0; i < obj->triangleArray.size; i++) {
+        obj->triangleArray.triangles[i].p1.posX = (mod->triangleArray.triangles[i].p1.posX) + (obj->location.posX);
+        obj->triangleArray.triangles[i].p1.posY = (mod->triangleArray.triangles[i].p1.posY) + (obj->location.posY);
+        obj->triangleArray.triangles[i].p1.posZ = (mod->triangleArray.triangles[i].p1.posZ) + (obj->location.posZ);
+
+        obj->triangleArray.triangles[i].p2.posX = (mod->triangleArray.triangles[i].p2.posX) + (obj->location.posX);
+        obj->triangleArray.triangles[i].p2.posY = (mod->triangleArray.triangles[i].p2.posY) + (obj->location.posY);
+        obj->triangleArray.triangles[i].p2.posZ = (mod->triangleArray.triangles[i].p2.posZ) + (obj->location.posZ);
+
+        obj->triangleArray.triangles[i].p3.posX = (mod->triangleArray.triangles[i].p3.posX) + (obj->location.posX);
+        obj->triangleArray.triangles[i].p3.posY = (mod->triangleArray.triangles[i].p3.posY) + (obj->location.posY);
+        obj->triangleArray.triangles[i].p3.posZ = (mod->triangleArray.triangles[i].p3.posZ) + (obj->location.posZ);
+    }
+}
+
+void update_object(Object *obj) {
+    for (int i = 0; i < obj->triangleArray.size; i++) {
+        obj->triangleArray.triangles[i].p1.posX += (obj->location.posX);
+        obj->triangleArray.triangles[i].p1.posY += (obj->location.posY);
+        obj->triangleArray.triangles[i].p1.posZ += (obj->location.posZ);
+
+        obj->triangleArray.triangles[i].p2.posX += (obj->location.posX);
+        obj->triangleArray.triangles[i].p2.posY += (obj->location.posY);
+        obj->triangleArray.triangles[i].p2.posZ += (obj->location.posZ);
+
+        obj->triangleArray.triangles[i].p3.posX += (obj->location.posX);
+        obj->triangleArray.triangles[i].p3.posY += (obj->location.posY);
+        obj->triangleArray.triangles[i].p3.posZ += (obj->location.posZ);
+    }
+}*/
+
+void load_Model_into_Object(Object *obj, Model model) {
+    obj->model = model;
+
+    for (int i = 0; i < obj->model.triangleArray.size; i++) {
+        obj->model.triangleArray.triangles[i].p1.posX += (obj->location.posX);
+        obj->model.triangleArray.triangles[i].p1.posY += (obj->location.posY);
+        obj->model.triangleArray.triangles[i].p1.posZ += (obj->location.posZ);
+
+        obj->model.triangleArray.triangles[i].p2.posX += (obj->location.posX);
+        obj->model.triangleArray.triangles[i].p2.posY += (obj->location.posY);
+        obj->model.triangleArray.triangles[i].p2.posZ += (obj->location.posZ);
+
+        obj->model.triangleArray.triangles[i].p3.posX += (obj->location.posX);
+        obj->model.triangleArray.triangles[i].p3.posY += (obj->location.posY);
+        obj->model.triangleArray.triangles[i].p3.posZ += (obj->location.posZ);
+    }
+}
+
+void move_Object_to_Point(Object *obj, Point point) {
+    Point deltaP;
+    deltaP.posX = point.posX - obj->location.posX;
+    deltaP.posY = point.posY - obj->location.posY;
+    deltaP.posZ = point.posZ - obj->location.posZ;
+
+    for (int i = 0; i < obj->model.triangleArray.size; i++) {
+        obj->model.triangleArray.triangles[i].p1.posX += deltaP.posX;
+        obj->model.triangleArray.triangles[i].p1.posY += deltaP.posY;
+        obj->model.triangleArray.triangles[i].p1.posZ += deltaP.posZ;
+
+        obj->model.triangleArray.triangles[i].p2.posX += deltaP.posX;
+        obj->model.triangleArray.triangles[i].p2.posY += deltaP.posY;
+        obj->model.triangleArray.triangles[i].p2.posZ += deltaP.posZ;
+
+        obj->model.triangleArray.triangles[i].p3.posX += deltaP.posX;
+        obj->model.triangleArray.triangles[i].p3.posY += deltaP.posY;
+        obj->model.triangleArray.triangles[i].p3.posZ += deltaP.posZ;
+    }
+
+    obj->location = point;
 }
 
 #endif

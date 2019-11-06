@@ -11,6 +11,10 @@
 #include "renderer.h"
 
 
+//Nem null pointert free-elek!
+//Ez a double free
+//Thas a problem mate
+
 //Screen dimension constants
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -63,9 +67,17 @@ int main( int argc, char* args[] ) {
 
     //Objektum innen
     //------------------------------------------------------------------------------------------------------------------
-    //Object cube;
-    //load_object_from_file("/home/coldus/Desktop/cube.txt", &cube);
+    Model cube;
+    load_model_from_file("/home/coldus/Desktop/test.txt", &cube);
     Point point;
+
+    Object cube1;
+    cube1.location.posX = 310;
+    cube1.location.posY = 100;
+    cube1.location.posZ = 300;
+
+    load_Model_into_Object(&cube1, cube);
+
     int x = 300,y = 100,z = 300;
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -116,19 +128,41 @@ int main( int argc, char* args[] ) {
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
-        triangle tri;
-        tri.p1 = point;
+        move_Object_to_Point(&cube1,point);
+        //printf("%d %d %d \n", point.posX, point.posY, point.posZ);
+        //triangle_array tri_array;
+        //init_triangle_array(&tri_array, 20);
+        /*for (int i = 0; i < 20; i++) {
+            tri_array.triangles[i].p1.posX = i;
+            tri_array.triangles[i].p1.posY = i;
+            tri_array.triangles[i].p1.posZ = i;
 
-        tri.p2.posX = point.posX +100;
-        tri.p2.posY = point.posY;
-        tri.p2.posZ = point.posZ +50;
+            tri_array.triangles[i].p2.posX = 3*i;
+            tri_array.triangles[i].p2.posY = 3*i;
+            tri_array.triangles[i].p2.posZ = 3*i;
 
-        tri.p3.posX = point.posX +100;
-        tri.p3.posY = point.posY - 50;
-        tri.p3.posZ = point.posZ;
+            tri_array.triangles[i].p3.posX = 2*i;
+            tri_array.triangles[i].p3.posY = 2*i;
+            tri_array.triangles[i].p3.posZ = 2*i;
+        }*/
+        //triangle tri;
+        //tri.p1 = point;
 
-        renderTriangle(tri, cam, renderer);
-        //renderObject(cube, cam, renderer);
+        //tri.p2.posX = point.posX +100;
+        //tri.p2.posY = point.posY;
+        //tri.p2.posZ = point.posZ +50;
+
+        //tri.p3.posX = point.posX +100;
+        //tri.p3.posY = point.posY - 50;
+        //tri.p3.posZ = point.posZ;
+
+        /*for (int i = 0; i<tri_array.size; i++) {
+            renderTriangle(tri_array.triangles[i],cam,renderer);
+        }*/
+        //free(tri_array.triangles);
+        //renderTriangle(tri, cam, renderer);
+        renderObject(cube1, cam, renderer);
+        //free(cube.triangleArray.triangles);
         //renderRect(cam, renderer, point);
         //renderCube(cam, renderer, point);
         SDL_RenderPresent(renderer);
@@ -137,6 +171,9 @@ int main( int argc, char* args[] ) {
     //Destroy window
     SDL_DestroyWindow( window );
 
+    //free(cube1.model.triangleArray.triangles);
+    free_model(&cube);
+    printf("BYE\n");
     //Quit SDL subsystems
     SDL_Quit();
 
