@@ -11,7 +11,7 @@ typedef struct triangle{Point p1; Point p2; Point p3} triangle;
 typedef struct din_point_array{Point* points; int size} din_point_array;
 typedef struct din_triangle_array{triangle* triangles; int size} triangle_array;
 typedef struct Model{triangle_array triangleArray} Model;
-typedef struct Object{Model model; Point location; double angle_from_z_axis; double angle_from_x_axis} Object;
+typedef struct Object{Model model; Point location; double angle_from_x_axis; double angle_from_y_axis; double angle_from_z_axis} Object;
 
 //typedef struct legalObject{triangle_array tri_array; Point location} legalObject;
 
@@ -119,50 +119,22 @@ void load_model_from_file(char *filename, Model *mod) {
     for (int i = 0; i < tri_array.size; i++) {
         mod->triangleArray.triangles[i] = tri_array.triangles[i];
     }
-    //obj->triangleArray.triangles = tri_array.triangles;
+    //mod->triangleArray.triangles = tri_array.triangles;
 
     fclose(fp);
     free_triangle_array(&tri_array);
     free_point_array(&pArray);
 }
 
-/*
-void load_model_into_object(Object *obj, Model *mod) {
-    init_triangle_array(&obj->triangleArray, mod->triangleArray.size);
-
-    for (int i = 0; i < obj->triangleArray.size; i++) {
-        obj->triangleArray.triangles[i].p1.posX = (mod->triangleArray.triangles[i].p1.posX) + (obj->location.posX);
-        obj->triangleArray.triangles[i].p1.posY = (mod->triangleArray.triangles[i].p1.posY) + (obj->location.posY);
-        obj->triangleArray.triangles[i].p1.posZ = (mod->triangleArray.triangles[i].p1.posZ) + (obj->location.posZ);
-
-        obj->triangleArray.triangles[i].p2.posX = (mod->triangleArray.triangles[i].p2.posX) + (obj->location.posX);
-        obj->triangleArray.triangles[i].p2.posY = (mod->triangleArray.triangles[i].p2.posY) + (obj->location.posY);
-        obj->triangleArray.triangles[i].p2.posZ = (mod->triangleArray.triangles[i].p2.posZ) + (obj->location.posZ);
-
-        obj->triangleArray.triangles[i].p3.posX = (mod->triangleArray.triangles[i].p3.posX) + (obj->location.posX);
-        obj->triangleArray.triangles[i].p3.posY = (mod->triangleArray.triangles[i].p3.posY) + (obj->location.posY);
-        obj->triangleArray.triangles[i].p3.posZ = (mod->triangleArray.triangles[i].p3.posZ) + (obj->location.posZ);
-    }
-}
-
-void update_object(Object *obj) {
-    for (int i = 0; i < obj->triangleArray.size; i++) {
-        obj->triangleArray.triangles[i].p1.posX += (obj->location.posX);
-        obj->triangleArray.triangles[i].p1.posY += (obj->location.posY);
-        obj->triangleArray.triangles[i].p1.posZ += (obj->location.posZ);
-
-        obj->triangleArray.triangles[i].p2.posX += (obj->location.posX);
-        obj->triangleArray.triangles[i].p2.posY += (obj->location.posY);
-        obj->triangleArray.triangles[i].p2.posZ += (obj->location.posZ);
-
-        obj->triangleArray.triangles[i].p3.posX += (obj->location.posX);
-        obj->triangleArray.triangles[i].p3.posY += (obj->location.posY);
-        obj->triangleArray.triangles[i].p3.posZ += (obj->location.posZ);
-    }
-}*/
-
 void load_Model_into_Object(Object *obj, Model model) {
-    obj->model = model;
+    Model newModel;
+    init_triangle_array(&newModel.triangleArray, model.triangleArray.size);
+
+    for (int i = 0; i < newModel.triangleArray.size; i++) {
+        newModel.triangleArray.triangles[i] = model.triangleArray.triangles[i];
+    }
+    //obj->model = model;
+    obj->model = newModel;
 
     for (int i = 0; i < obj->model.triangleArray.size; i++) {
         obj->model.triangleArray.triangles[i].p1.posX += (obj->location.posX);
@@ -200,6 +172,59 @@ void move_Object_to_Point(Object *obj, Point point) {
     }
 
     obj->location = point;
+}
+
+double dist_btw_Points(Point p1, Point p2) {
+    //Ket dimnezioban (x^2+y^2)^(1/2)
+    //delta X
+    //delta Y
+
+    //3D-ben
+    //X, Y, Z - A,B,C
+    //(x^2 + y^2 + z^2)^(1/2)
+
+    Point deltaP = {p2.posX - p1.posX, p2.posY - p1.posY, p2.posZ - p1.posZ};
+    return  sqrt(deltaP.posX*deltaP.posX + deltaP.posY * deltaP.posY + deltaP.posZ * deltaP.posZ);
+}
+
+void rotate_Point_around_Point(Point center, Point *rotatedPoint, double rotX, double rotY, double rotZ) {
+    double dx = rotatedPoint->posX - center.posX;
+    double dy = rotatedPoint->posY - center.posY;
+    double dz = rotatedPoint->posZ - center.posZ;
+
+    //X-tengely körüli forgatas:
+    if (rotX != 0) {
+        rotatedPoint->posY = center.posY + (int) round(dy * cos(rotX) - dz * sin(rotX));
+        rotatedPoint->posZ = center.posZ + (int) round(dz * cos(rotX) + dy * sin(rotX));
+    }
+
+    //Y-tengely körüli forgatas:
+    if (rotY != 0) {
+        rotatedPoint->posX = center.posX + (int) round(dx * cos(rotY) + dz * sin(rotY));
+        rotatedPoint->posZ = center.posZ + (int) round(dz * cos(rotY) - dx * sin(rotY));
+    }
+
+    //Z-tengely körüli forgatas:
+    if (rotZ != 0) {
+        rotatedPoint->posX = center.posX + (int) round(dx * cos(rotZ) - dy * sin(rotZ));
+        rotatedPoint->posY = center.posY + (int) round(dx * sin(rotZ) + dy * cos(rotZ));
+    }
+}
+
+void free_object(Object *obj) {
+    free(obj->model.triangleArray.triangles);
+}
+
+/* A haromszogek minden pontjat a center kozul elforgatjuk
+ * a megfelelo szogben egyenkent, es igy az eesz objektum elfordul majd
+ * */
+
+void rotate_Object_around_Point(Point center, Object *obj, double rotX, double rotY, double rotZ) {
+    for (int i = 0; i < obj->model.triangleArray.size; i++) {
+        rotate_Point_around_Point(obj->location, &obj->model.triangleArray.triangles[i].p1, rotX, rotY, rotZ);
+        rotate_Point_around_Point(obj->location, &obj->model.triangleArray.triangles[i].p2, rotX, rotY, rotZ);
+        rotate_Point_around_Point(obj->location, &obj->model.triangleArray.triangles[i].p3, rotX, rotY, rotZ);
+    }
 }
 
 #endif

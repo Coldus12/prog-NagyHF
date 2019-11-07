@@ -10,6 +10,15 @@
 #include "object.h"
 #include "renderer.h"
 
+/*TODO
+ * Nincs peldanyositva a "model", igy annak a pontjait
+ * irja at az object minden egyes valtoztatasnal
+ * ez az azert problema, mert igy ha meg egy object.-et
+ * letrehozok ugyanazon modellel, akkor nem lesznek masok a
+ * az objectpontjainak koordinatai
+ * */
+
+#define M_PI acos(-1.0)
 
 //Nem null pointert free-elek!
 //Ez a double free
@@ -68,17 +77,44 @@ int main( int argc, char* args[] ) {
     //Objektum innen
     //------------------------------------------------------------------------------------------------------------------
     Model cube;
-    load_model_from_file("/home/coldus/Desktop/test.txt", &cube);
+    load_model_from_file("/home/coldus/Desktop/cube.txt", &cube);
     Point point;
 
-    Object cube1;
-    cube1.location.posX = 310;
+    Object cube1, cube2, cube3, cube4;
+    cube1.location.posX = 300;
     cube1.location.posY = 100;
     cube1.location.posZ = 300;
 
-    load_Model_into_Object(&cube1, cube);
+    cube2.location.posX = 300;
+    cube2.location.posY = 100;
+    cube2.location.posZ = 300;
 
+    cube3.location.posX = 300;
+    cube3.location.posY = 100;
+    cube3.location.posZ = 300;
+
+    cube4.location.posX = 300;
+    cube4.location.posY = 100;
+    cube4.location.posZ = 300;
+
+    load_Model_into_Object(&cube1, cube);
+    load_Model_into_Object(&cube2, cube);
+    load_Model_into_Object(&cube3, cube);
+    load_Model_into_Object(&cube4, cube);
+
+    //                              Distance test
+    //------------------------------------------------------------------------------------------------------------------
+
+    /*Point a = {0, 40, 30};
+    Point b = {0, 0, 0};
+    printf("tavolsag a-b: %d\n", dist_btw_Points(a, b));*/
+
+    //------------------------------------------------------------------------------------------------------------------
     int x = 300,y = 100,z = 300;
+    int a = 0, b = 0, c = 0;
+
+    double degree = (M_PI/180);
+    //Point point;
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -117,6 +153,25 @@ int main( int argc, char* args[] ) {
                         cam.distanceFromPlane--;
                         printf("%d\n", cam.distanceFromPlane);
                         break;
+                    case SDLK_u:
+                        a++;
+                        printf("a: %d\n", a);
+                        break;
+                    case SDLK_i:
+                        a--;
+                        break;
+                    case SDLK_z:
+                        b++;
+                        break;
+                    case SDLK_t:
+                        b--;
+                        break;
+                    case SDLK_r:
+                        c++;
+                        break;
+                    case SDLK_e:
+                        c--;
+                        break;
                 }
             }
         }
@@ -125,46 +180,35 @@ int main( int argc, char* args[] ) {
         point.posY = y;
         point.posZ = z;
 
+        //rotate_Point_around_Point(cam.location, &point,  a*degree, 0*degree, 0*degree);
+
+        Point p2 = { x+60, y, z};
+        Point p3 = {x + 60, y, z+60};
+        Point p4 = {x, y, z+60};
+
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
+        //rotate_Point_around_Point(point, &p2, 0*degree, 0*degree, a*degree);
+        rotate_Object_around_Point(cube2.location, &cube2, 10*a*degree,10*b*degree,10*c*degree);
+        a = 0; b = 0; c = 0;
+
+        /*renderpoint(cam,renderer, point);
+        renderpoint(cam,renderer, p2);
+        renderpoint(cam,renderer, p3);
+        renderpoint(cam,renderer, p4);*/
+
         move_Object_to_Point(&cube1,point);
-        //printf("%d %d %d \n", point.posX, point.posY, point.posZ);
-        //triangle_array tri_array;
-        //init_triangle_array(&tri_array, 20);
-        /*for (int i = 0; i < 20; i++) {
-            tri_array.triangles[i].p1.posX = i;
-            tri_array.triangles[i].p1.posY = i;
-            tri_array.triangles[i].p1.posZ = i;
+        move_Object_to_Point(&cube2, p2);
+        move_Object_to_Point(&cube3, p3);
+        move_Object_to_Point(&cube4, p4);
 
-            tri_array.triangles[i].p2.posX = 3*i;
-            tri_array.triangles[i].p2.posY = 3*i;
-            tri_array.triangles[i].p2.posZ = 3*i;
 
-            tri_array.triangles[i].p3.posX = 2*i;
-            tri_array.triangles[i].p3.posY = 2*i;
-            tri_array.triangles[i].p3.posZ = 2*i;
-        }*/
-        //triangle tri;
-        //tri.p1 = point;
-
-        //tri.p2.posX = point.posX +100;
-        //tri.p2.posY = point.posY;
-        //tri.p2.posZ = point.posZ +50;
-
-        //tri.p3.posX = point.posX +100;
-        //tri.p3.posY = point.posY - 50;
-        //tri.p3.posZ = point.posZ;
-
-        /*for (int i = 0; i<tri_array.size; i++) {
-            renderTriangle(tri_array.triangles[i],cam,renderer);
-        }*/
-        //free(tri_array.triangles);
-        //renderTriangle(tri, cam, renderer);
         renderObject(cube1, cam, renderer);
-        //free(cube.triangleArray.triangles);
-        //renderRect(cam, renderer, point);
-        //renderCube(cam, renderer, point);
+        renderObject(cube2, cam, renderer);
+        renderObject(cube3, cam, renderer);
+        renderObject(cube4, cam, renderer);
+
         SDL_RenderPresent(renderer);
     }
 
@@ -172,6 +216,11 @@ int main( int argc, char* args[] ) {
     SDL_DestroyWindow( window );
 
     //free(cube1.model.triangleArray.triangles);
+
+    free_object(&cube1);
+    free_object(&cube2);
+    free_object(&cube3);
+    free_object(&cube4);
     free_model(&cube);
     printf("BYE\n");
     //Quit SDL subsystems

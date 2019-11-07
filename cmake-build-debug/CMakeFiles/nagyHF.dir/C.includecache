@@ -22,15 +22,11 @@ stdlib.h
 additional.h
 /home/coldus/CLionProjects/nagyHF/additional.h
 
-/home/coldus/CLionProjects/nagyHF/object.h
+/home/coldus/CLionProjects/nagyHF/object.c
 additional.h
 /home/coldus/CLionProjects/nagyHF/additional.h
-
-/home/coldus/CLionProjects/nagyHF/renderer.c
-object.h
-/home/coldus/CLionProjects/nagyHF/object.h
-additional.h
-/home/coldus/CLionProjects/nagyHF/additional.h
+stdbool.h
+-
 
 /usr/include/SDL2/SDL.h
 SDL_main.h

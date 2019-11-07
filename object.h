@@ -10,7 +10,7 @@ typedef struct triangle{Point p1; Point p2; Point p3} triangle;
 typedef struct din_point_array{Point* points; int size} din_point_array;
 typedef struct din_triangle_array{triangle* triangles; int size} triangle_array;
 
-//----------------------------------------------------------------
+//-----------------------------------------------------------------
 
 void init_point_array(din_point_array* din_array, int size);
 bool resize_point_array(din_point_array* din_array, int new_size);
@@ -30,8 +30,18 @@ void load_model_from_file(char* filename, Model *mod);
 
 //-----------------------------------------------------------------
 
-typedef struct Object{Model model; Point location; double angle_from_z_axis; double angle_from_x_axis} Object;
+typedef struct Object{Model model; Point location; double angle_from_x_axis; double angle_from_y_axis; double angle_from_z_axis} Object;
 void move_Object_to_Point(Object *obj, Point point);
 void load_Model_into_Object(Object *obj, Model model);
+void free_object(Object *obj);
+
+//----------------------------------------------------------------
+
+double dist_btw_Points(Point p1, Point p2);
+void rotate_Point_around_Point(Point center, Point *rotatedPoint, double rotX, double rotY, double rotZ);
+void rotate_Object_around_Point(Point center, Object *obj, double rotX, double rotY, double rotZ);
+
+//----------------------------------------------------------------
+
 
 #endif //NAGYHF_OBJECT_H
