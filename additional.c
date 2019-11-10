@@ -7,7 +7,7 @@
 #include <SDL_render.h>
 #include <SDL2_gfxPrimitives.h>
 
-typedef struct Point{int posX; int posY; int posZ} Point;
+typedef struct Point{double posX; double posY; double posZ} Point;
 
 typedef struct Camera{Point location; int viewDistance; int planeSizeX; int planeSizeY; int distanceFromPlane} Camera;
 
@@ -32,12 +32,12 @@ Point interRenderPoint(Camera cam, Point p) {
     //vetulet.posZ = cam.location.posZ + cam.distanceFromPlane;
     vetulet.posZ = 0;
 
-    int relativY = round((double) cam.distanceFromPlane*(((double) p.posY - cam.location.posY)/( (double) p.posZ - cam.location.posZ)));
-    int relativX = round((double) cam.distanceFromPlane*(((double) p.posX - cam.location.posX)/( (double) p.posZ - cam.location.posZ)));
+    double relativY = round((double) cam.distanceFromPlane*(((double) p.posY - cam.location.posY)/( (double) p.posZ - cam.location.posZ)));
+    double relativX = round((double) cam.distanceFromPlane*(((double) p.posX - cam.location.posX)/( (double) p.posZ - cam.location.posZ)));
 
     //Szamolas
-    vetulet.posY = (int) round(((double) cam.planeSizeY/2) - relativY);
-    vetulet.posX = (int) round(((double) cam.planeSizeX/2) + relativX);
+    vetulet.posY = ((double) cam.planeSizeY/2) - relativY;
+    vetulet.posX = ((double) cam.planeSizeX/2) + relativX;
 
     return vetulet;
 

@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include "additional.h"
 
-typedef struct Point{int posX; int posY; int posZ} Point;
+typedef struct Point{double posX; double posY; double posZ} Point;
 
 typedef struct Camera{Point location; int viewDistance; int planeSizeX; int planeSizeY; int distanceFromPlane} Camera;
 

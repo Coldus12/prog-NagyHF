@@ -78,7 +78,7 @@ int main( int argc, char* args[] ) {
     //------------------------------------------------------------------------------------------------------------------
     Model cube;
     load_model_from_file("/home/coldus/Desktop/cube.txt", &cube);
-    Point point;
+    //Point point;
 
     Object cube1, cube2, cube3, cube4;
     cube1.location.posX = 300;
@@ -110,11 +110,13 @@ int main( int argc, char* args[] ) {
     printf("tavolsag a-b: %d\n", dist_btw_Points(a, b));*/
 
     //------------------------------------------------------------------------------------------------------------------
-    int x = 300,y = 100,z = 300;
+    int x = 0,y = 0,z = 0;
     int a = 0, b = 0, c = 0;
 
     double degree = (M_PI/180);
-    //Point point;
+    Point point = {300, 100, 300};
+    Point teszt = {300 + 60, 100, 300};
+    Point p2 = {300+60, 100 ,300}, p3 = {300+60, 100, 300+60}, p4 = {300, 100, 300+60};
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -176,27 +178,51 @@ int main( int argc, char* args[] ) {
             }
         }
 
-        point.posX = x;
-        point.posY = y;
-        point.posZ = z;
+        point.posX += x;
+        point.posY += y;
+        point.posZ += z;
+
+        p2.posX += x;
+        p2.posY += y;
+        p2.posZ += z;
+
+        p3.posX += x;
+        p3.posY += y;
+        p3.posZ += z;
+
+        p4.posX += x;
+        p4.posY += y;
+        p4.posZ += z;
+
+        /*teszt.posX += x;
+        teszt.posY += y;
+        teszt.posZ += z;*/
+
+        /*Point p2 = { x+60, y, z};
+        Point p3 = {x + 60, y, z+60};
+        Point p4 = {x, y, z+60};*/
+
+        /*double dx = teszt.posX - x;
+        double dy = teszt.posY - y;
+        double dz = teszt.posZ - z;*/
 
         //rotate_Point_around_Point(cam.location, &point,  a*degree, 0*degree, 0*degree);
-
-        Point p2 = { x+60, y, z};
-        Point p3 = {x + 60, y, z+60};
-        Point p4 = {x, y, z+60};
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
-        //rotate_Point_around_Point(point, &p2, 0*degree, 0*degree, a*degree);
-        rotate_Object_around_Point(cube2.location, &cube2, 10*a*degree,10*b*degree,10*c*degree);
+        //a++;
+        //rotate_Point_around_Point(point, &teszt, a*10*degree, b*10*degree, c*10*degree);
+
+        //printf("teszt koordinatai: x: %.2lf y: %.2lf z: %.2lf\n",teszt.posX, teszt.posY, teszt.posZ);
+        rotate_Object_around_Point(cube1.location, &cube2, 10*a*degree,10*b*degree,10*c*degree);
         a = 0; b = 0; c = 0;
 
         /*renderpoint(cam,renderer, point);
         renderpoint(cam,renderer, p2);
         renderpoint(cam,renderer, p3);
-        renderpoint(cam,renderer, p4);*/
+        renderpoint(cam,renderer, p4);
+        renderpoint(cam, renderer, teszt); */
 
         move_Object_to_Point(&cube1,point);
         move_Object_to_Point(&cube2, p2);
@@ -210,6 +236,9 @@ int main( int argc, char* args[] ) {
         renderObject(cube4, cam, renderer);
 
         SDL_RenderPresent(renderer);
+        x = 0;
+        y = 0;
+        z = 0;
     }
 
     //Destroy window
@@ -222,6 +251,7 @@ int main( int argc, char* args[] ) {
     free_object(&cube3);
     free_object(&cube4);
     free_model(&cube);
+
     printf("BYE\n");
     //Quit SDL subsystems
     SDL_Quit();

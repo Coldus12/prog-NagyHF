@@ -47,7 +47,7 @@ void init_triangle_array(triangle_array* din_array, int size) {
 }
 
 bool resize_triangle_array(triangle_array *din_array, int new_size) {
-    triangle *new_tri = (Point*) malloc(new_size * sizeof(triangle));
+    triangle *new_tri = (triangle*) malloc(new_size * sizeof(triangle));
     if (new_tri == NULL) {
         return false;
     }
@@ -194,21 +194,45 @@ void rotate_Point_around_Point(Point center, Point *rotatedPoint, double rotX, d
 
     //X-tengely körüli forgatas:
     if (rotX != 0) {
-        rotatedPoint->posY = center.posY + (int) round(dy * cos(rotX) - dz * sin(rotX));
-        rotatedPoint->posZ = center.posZ + (int) round(dz * cos(rotX) + dy * sin(rotX));
+        rotatedPoint->posY = center.posY + dy * cos(rotX) - dz * sin(rotX);
+        rotatedPoint->posZ = center.posZ + dz * cos(rotX) + dy * sin(rotX);
     }
 
     //Y-tengely körüli forgatas:
     if (rotY != 0) {
-        rotatedPoint->posX = center.posX + (int) round(dx * cos(rotY) + dz * sin(rotY));
-        rotatedPoint->posZ = center.posZ + (int) round(dz * cos(rotY) - dx * sin(rotY));
+        rotatedPoint->posX = center.posX + dx * cos(rotY) + dz * sin(rotY);
+        rotatedPoint->posZ = center.posZ + dz * cos(rotY) - dx * sin(rotY);
     }
 
     //Z-tengely körüli forgatas:
     if (rotZ != 0) {
-        rotatedPoint->posX = center.posX + (int) round(dx * cos(rotZ) - dy * sin(rotZ));
-        rotatedPoint->posY = center.posY + (int) round(dx * sin(rotZ) + dy * cos(rotZ));
+        rotatedPoint->posX = center.posX + dx * cos(rotZ) - dy * sin(rotZ);
+        rotatedPoint->posY = center.posY + dx * sin(rotZ) + dy * cos(rotZ);
     }
+
+    /*
+    double dx = rotatedPoint->posX;
+    double dy = rotatedPoint->posY;
+    double dz = rotatedPoint->posZ;
+
+    //X-tengely körüli forgatas:
+    if (rotX != 0) {
+        rotatedPoint->posY = dy * cos(rotX) - dz * sin(rotX);
+        rotatedPoint->posZ = dz * cos(rotX) + dy * sin(rotX);
+    }
+
+    //Y-tengely körüli forgatas:
+    if (rotY != 0) {
+        rotatedPoint->posX = dx * cos(rotY) + dz * sin(rotY);
+        rotatedPoint->posZ = dz * cos(rotY) - dx * sin(rotY);
+    }
+
+    //Z-tengely körüli forgatas:
+    if (rotZ != 0) {
+        rotatedPoint->posX = dx * cos(rotZ) - dy * sin(rotZ);
+        rotatedPoint->posY = dx * sin(rotZ) + dy * cos(rotZ);
+    }
+     */
 }
 
 void free_object(Object *obj) {
@@ -216,14 +240,14 @@ void free_object(Object *obj) {
 }
 
 /* A haromszogek minden pontjat a center kozul elforgatjuk
- * a megfelelo szogben egyenkent, es igy az eesz objektum elfordul majd
+ * a megfelelo szogben egyenkent, es igy az egesz objektum elfordul majd
  * */
 
 void rotate_Object_around_Point(Point center, Object *obj, double rotX, double rotY, double rotZ) {
     for (int i = 0; i < obj->model.triangleArray.size; i++) {
-        rotate_Point_around_Point(obj->location, &obj->model.triangleArray.triangles[i].p1, rotX, rotY, rotZ);
-        rotate_Point_around_Point(obj->location, &obj->model.triangleArray.triangles[i].p2, rotX, rotY, rotZ);
-        rotate_Point_around_Point(obj->location, &obj->model.triangleArray.triangles[i].p3, rotX, rotY, rotZ);
+        rotate_Point_around_Point(center, &obj->model.triangleArray.triangles[i].p1, rotX, rotY, rotZ);
+        rotate_Point_around_Point(center, &obj->model.triangleArray.triangles[i].p2, rotX, rotY, rotZ);
+        rotate_Point_around_Point(center, &obj->model.triangleArray.triangles[i].p3, rotX, rotY, rotZ);
     }
 }
 
