@@ -123,33 +123,6 @@ nagyHF/fast:
 	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/build
 .PHONY : nagyHF/fast
 
-additional.o: additional.c.o
-
-.PHONY : additional.o
-
-# target to build an object file
-additional.c.o:
-	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/additional.c.o
-.PHONY : additional.c.o
-
-additional.i: additional.c.i
-
-.PHONY : additional.i
-
-# target to preprocess a source file
-additional.c.i:
-	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/additional.c.i
-.PHONY : additional.c.i
-
-additional.s: additional.c.s
-
-.PHONY : additional.s
-
-# target to generate assembly for a file
-additional.c.s:
-	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/additional.c.s
-.PHONY : additional.c.s
-
 main.o: main.c.o
 
 .PHONY : main.o
@@ -240,9 +213,6 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... nagyHF"
 	@echo "... edit_cache"
-	@echo "... additional.o"
-	@echo "... additional.i"
-	@echo "... additional.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

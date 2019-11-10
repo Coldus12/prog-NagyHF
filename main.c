@@ -6,7 +6,6 @@
 #include <SDL2_gfxPrimitives.h>
 #include <math.h>
 #include <stdlib.h>
-#include "additional.h"
 #include "object.h"
 #include "renderer.h"
 
@@ -18,25 +17,9 @@
  * az objectpontjainak koordinatai
  * */
 
-#define M_PI acos(-1.0)
-
-//Nem null pointert free-elek!
-//Ez a double free
-//Thas a problem mate
-
 //Screen dimension constants
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
-
-enum KeyPressSurfaces
-{
-    KEY_PRESS_SURFACE_DEFAULT,
-    KEY_PRESS_SURFACE_UP,
-    KEY_PRESS_SURFACE_DOWN,
-    KEY_PRESS_SURFACE_LEFT,
-    KEY_PRESS_SURFACE_RIGHT,
-    KEY_PRESS_SURFACE_TOTAL
-};
 
 int main( int argc, char* args[] ) {
     //The window we'll be rendering to
@@ -69,7 +52,7 @@ int main( int argc, char* args[] ) {
 
     cam.location.posX = 200;
     cam.location.posY = 300;
-    cam.location.posZ = 0;
+    cam.location.posZ = 100;
     cam.distanceFromPlane = 500;
     cam.planeSizeX = SCREEN_WIDTH;
     cam.planeSizeY = SCREEN_HEIGHT;
@@ -115,8 +98,11 @@ int main( int argc, char* args[] ) {
 
     double degree = (M_PI/180);
     Point point = {300, 100, 300};
-    Point teszt = {300 + 60, 100, 300};
     Point p2 = {300+60, 100 ,300}, p3 = {300+60, 100, 300+60}, p4 = {300, 100, 300+60};
+    cam.rotX = 0*degree;
+    cam.rotY = 0*degree;
+    cam.rotZ = 0*degree;
+
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -178,7 +164,7 @@ int main( int argc, char* args[] ) {
             }
         }
 
-        point.posX += x;
+        /*point.posX += x;
         point.posY += y;
         point.posZ += z;
 
@@ -192,7 +178,11 @@ int main( int argc, char* args[] ) {
 
         p4.posX += x;
         p4.posY += y;
-        p4.posZ += z;
+        p4.posZ += z;*/
+
+        cam.location.posX += x;
+        cam.location.posY += y;
+        cam.location.posZ += z;
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
@@ -201,7 +191,17 @@ int main( int argc, char* args[] ) {
         //a++;
         //rotate_Point_around_Point(point, &teszt, a*10*degree, b*10*degree, c*10*degree);
         //printf("teszt koordinatai: x: %.2lf y: %.2lf z: %.2lf\n",teszt.posX, teszt.posY, teszt.posZ);
-        rotate_Object_around_Point(cube1.location, &cube2, 10*a*degree,10*b*degree,10*c*degree);
+        //rotate_Object_around_Point(cube1.location, &cube2, 10*a*degree,10*b*degree,10*c*degree);
+
+        rotate_Object_around_Point(cam.location, &cube1, a*10*degree, b*10*degree, c*10*degree);
+        rotate_Object_around_Point(cam.location, &cube2, a*10*degree, b*10*degree, c*10*degree);
+        rotate_Object_around_Point(cam.location, &cube3, a*10*degree, b*10*degree, c*10*degree);
+        rotate_Object_around_Point(cam.location, &cube4, a*10*degree, b*10*degree, c*10*degree);
+
+        /*cam.rotX = a*10*degree;
+        cam.rotY = b*10*degree;
+        cam.rotZ = c*10*degree;*/
+
         a = 0; b = 0; c = 0;
 
         move_Object_to_Point(&cube1,point);

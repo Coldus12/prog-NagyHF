@@ -78,12 +78,6 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/coldus/CLionProjects/nagyHF/additional.c">
-			<Option target="nagyHF"/>
-		</Unit>
-		<Unit filename="/home/coldus/CLionProjects/nagyHF/additional.h">
-			<Option target="nagyHF"/>
-		</Unit>
 		<Unit filename="/home/coldus/CLionProjects/nagyHF/main.c">
 			<Option target="nagyHF"/>
 		</Unit>

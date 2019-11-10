@@ -4,8 +4,10 @@
 
 #ifndef NAGYHF_OBJECT_H
 #define NAGYHF_OBJECT_H
-#include "additional.h"
 
+#include <stdbool.h>
+
+typedef struct Point{double posX; double posY; double posZ} Point;
 typedef struct triangle{Point p1; Point p2; Point p3} triangle;
 typedef struct din_point_array{Point* points; int size} din_point_array;
 typedef struct din_triangle_array{triangle* triangles; int size} triangle_array;
@@ -38,6 +40,7 @@ void free_object(Object *obj);
 //----------------------------------------------------------------
 
 double dist_btw_Points(Point p1, Point p2);
+Point rotate_Point_around_Point_wo_change(Point center, Point rotatedPoint, double rotX, double rotY, double rotZ);
 void rotate_Point_around_Point(Point center, Point *rotatedPoint, double rotX, double rotY, double rotZ);
 void rotate_Object_around_Point(Point center, Object *obj, double rotX, double rotY, double rotZ);
 

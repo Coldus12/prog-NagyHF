@@ -3,7 +3,7 @@ project(nagyHF C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(nagyHF main.c additional.c additional.h object.c object.h renderer.c renderer.h)
+add_executable(nagyHF main.c object.c object.h renderer.c renderer.h)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
 

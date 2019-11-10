@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/coldus/CLionProjects/nagyHF/additional.h
+/home/coldus/CLionProjects/nagyHF/main.c
 SDL.h
 -
 stdio.h
@@ -19,18 +19,22 @@ math.h
 -
 stdlib.h
 -
-additional.h
-/home/coldus/CLionProjects/nagyHF/additional.h
-
-/home/coldus/CLionProjects/nagyHF/object.h
-additional.h
-/home/coldus/CLionProjects/nagyHF/additional.h
-
-/home/coldus/CLionProjects/nagyHF/renderer.c
 object.h
 /home/coldus/CLionProjects/nagyHF/object.h
-additional.h
-/home/coldus/CLionProjects/nagyHF/additional.h
+renderer.h
+/home/coldus/CLionProjects/nagyHF/renderer.h
+
+/home/coldus/CLionProjects/nagyHF/object.h
+stdbool.h
+-
+
+/home/coldus/CLionProjects/nagyHF/renderer.h
+SDL_render.h
+-
+SDL2_gfxPrimitives.h
+-
+object.h
+/home/coldus/CLionProjects/nagyHF/object.h
 
 /usr/include/SDL2/SDL.h
 SDL_main.h

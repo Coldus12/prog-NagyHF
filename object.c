@@ -4,9 +4,15 @@
 
 #ifndef object
 #define object
-#include "additional.h"
-#include <stdbool.h>
 
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+
+typedef struct Point{double posX; double posY; double posZ} Point;
 typedef struct triangle{Point p1; Point p2; Point p3} triangle;
 typedef struct din_point_array{Point* points; int size} din_point_array;
 typedef struct din_triangle_array{triangle* triangles; int size} triangle_array;
@@ -185,6 +191,29 @@ double dist_btw_Points(Point p1, Point p2) {
 
     Point deltaP = {p2.posX - p1.posX, p2.posY - p1.posY, p2.posZ - p1.posZ};
     return  sqrt(deltaP.posX*deltaP.posX + deltaP.posY * deltaP.posY + deltaP.posZ * deltaP.posZ);
+}
+
+Point rotate_Point_around_Point_wo_change(Point center, Point rotatedPoint, double rotX, double rotY, double rotZ) {
+    Point returnP;
+    double dx = rotatedPoint.posX - center.posX;
+    double dy = rotatedPoint.posY - center.posY;
+    double dz = rotatedPoint.posZ - center.posZ;
+
+    //X-tengely körüli forgatas:
+    returnP.posY = center.posY + dy * cos(rotX) - dz * sin(rotX);
+    returnP.posZ = center.posZ + dz * cos(rotX) + dy * sin(rotX);
+
+
+    //Y-tengely körüli forgatas:
+    returnP.posX = center.posX + dx * cos(rotY) + dz * sin(rotY);
+    returnP.posZ = center.posZ + dz * cos(rotY) - dx * sin(rotY);
+
+
+    //Z-tengely körüli forgatas:
+    returnP.posX = center.posX + dx * cos(rotZ) - dy * sin(rotZ);
+    returnP.posY = center.posY + dx * sin(rotZ) + dy * cos(rotZ);
+
+    return returnP;
 }
 
 void rotate_Point_around_Point(Point center, Point *rotatedPoint, double rotX, double rotY, double rotZ) {
