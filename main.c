@@ -194,35 +194,15 @@ int main( int argc, char* args[] ) {
         p4.posY += y;
         p4.posZ += z;
 
-        /*teszt.posX += x;
-        teszt.posY += y;
-        teszt.posZ += z;*/
-
-        /*Point p2 = { x+60, y, z};
-        Point p3 = {x + 60, y, z+60};
-        Point p4 = {x, y, z+60};*/
-
-        /*double dx = teszt.posX - x;
-        double dy = teszt.posY - y;
-        double dz = teszt.posZ - z;*/
-
-        //rotate_Point_around_Point(cam.location, &point,  a*degree, 0*degree, 0*degree);
-
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
+
         //a++;
         //rotate_Point_around_Point(point, &teszt, a*10*degree, b*10*degree, c*10*degree);
-
         //printf("teszt koordinatai: x: %.2lf y: %.2lf z: %.2lf\n",teszt.posX, teszt.posY, teszt.posZ);
         rotate_Object_around_Point(cube1.location, &cube2, 10*a*degree,10*b*degree,10*c*degree);
         a = 0; b = 0; c = 0;
-
-        /*renderpoint(cam,renderer, point);
-        renderpoint(cam,renderer, p2);
-        renderpoint(cam,renderer, p3);
-        renderpoint(cam,renderer, p4);
-        renderpoint(cam, renderer, teszt); */
 
         move_Object_to_Point(&cube1,point);
         move_Object_to_Point(&cube2, p2);
