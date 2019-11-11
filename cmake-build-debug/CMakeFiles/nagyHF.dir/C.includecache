@@ -24,9 +24,31 @@ object.h
 renderer.h
 /home/coldus/CLionProjects/nagyHF/renderer.h
 
+/home/coldus/CLionProjects/nagyHF/object.c
+stdbool.h
+-
+stdlib.h
+-
+stdbool.h
+-
+stdio.h
+-
+string.h
+-
+math.h
+-
+
 /home/coldus/CLionProjects/nagyHF/object.h
 stdbool.h
 -
+
+/home/coldus/CLionProjects/nagyHF/renderer.c
+SDL_render.h
+-
+SDL2_gfxPrimitives.h
+-
+object.h
+/home/coldus/CLionProjects/nagyHF/object.h
 
 /home/coldus/CLionProjects/nagyHF/renderer.h
 SDL_render.h

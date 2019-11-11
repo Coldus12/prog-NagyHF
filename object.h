@@ -40,6 +40,9 @@ void free_object(Object *obj);
 //----------------------------------------------------------------
 
 double dist_btw_Points(Point p1, Point p2);
+void rotate_Point_around_Points_xAxis(Point center, Point *rotatedPoint, double rotX);
+void rotate_Point_around_Points_yAxis(Point center, Point *rotatedPoint, double rotY);
+void rotate_Point_around_Points_zAxis(Point center, Point *rotatedPoint, double rotZ);
 Point rotate_Point_around_Point_wo_change(Point center, Point rotatedPoint, double rotX, double rotY, double rotZ);
 void rotate_Point_around_Point(Point center, Point *rotatedPoint, double rotX, double rotY, double rotZ);
 void rotate_Object_around_Point(Point center, Object *obj, double rotX, double rotY, double rotZ);

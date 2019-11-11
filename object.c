@@ -216,28 +216,91 @@ Point rotate_Point_around_Point_wo_change(Point center, Point rotatedPoint, doub
     return returnP;
 }
 
-void rotate_Point_around_Point(Point center, Point *rotatedPoint, double rotX, double rotY, double rotZ) {
-    double dx = rotatedPoint->posX - center.posX;
+void rotate_Point_around_Points_xAxis(Point center, Point *rotatedPoint, double rotX) {
     double dy = rotatedPoint->posY - center.posY;
     double dz = rotatedPoint->posZ - center.posZ;
 
+    rotatedPoint->posY -= center.posY;
+    rotatedPoint->posZ -= center.posZ;
+
     //X-tengely körüli forgatas:
     if (rotX != 0) {
-        rotatedPoint->posY = center.posY + dy * cos(rotX) - dz * sin(rotX);
-        rotatedPoint->posZ = center.posZ + dz * cos(rotX) + dy * sin(rotX);
+        rotatedPoint->posY = dy * cos(rotX) - dz * sin(rotX);
+        rotatedPoint->posZ = dz * cos(rotX) + dy * sin(rotX);
+    }
+
+    rotatedPoint->posY += center.posY;
+    rotatedPoint->posZ += center.posZ;
+}
+
+void rotate_Point_around_Points_yAxis(Point center, Point *rotatedPoint, double rotY) {
+    double dx = rotatedPoint->posX - center.posX;
+    double dz = rotatedPoint->posZ - center.posZ;
+
+    rotatedPoint->posX -= center.posX;
+    rotatedPoint->posZ -= center.posZ;
+
+    //Y-tengely körüli forgatas:
+    if (rotY != 0) {
+        rotatedPoint->posX = dx * cos(rotY) + dz * sin(rotY);
+        rotatedPoint->posZ = dz * cos(rotY) - dx * sin(rotY);
+    }
+
+    rotatedPoint->posX += center.posX;
+    rotatedPoint->posZ += center.posZ;
+}
+
+void rotate_Point_around_Points_zAxis(Point center, Point *rotatedPoint, double rotZ) {
+    double dx = rotatedPoint->posX - center.posX;
+    double dy = rotatedPoint->posY - center.posY;
+
+    rotatedPoint->posX -= center.posX;
+    rotatedPoint->posY -= center.posY;
+
+    //Z-tengely körüli forgatas:
+    if (rotZ != 0) {
+        rotatedPoint->posX = dx * cos(rotZ) - dy * sin(rotZ);
+        rotatedPoint->posY = dx * sin(rotZ) + dy * cos(rotZ);
+    }
+
+    rotatedPoint->posX += center.posX;
+    rotatedPoint->posY += center.posY;
+}
+
+void rotate_Point_around_Point(Point center, Point *rotatedPoint, double rotX, double rotY, double rotZ) {
+    rotate_Point_around_Points_xAxis(center, rotatedPoint, rotX);
+    rotate_Point_around_Points_yAxis(center, rotatedPoint, rotY);
+    rotate_Point_around_Points_zAxis(center, rotatedPoint, rotZ);
+
+    /*double dx = rotatedPoint->posX - center.posX;
+    double dy = rotatedPoint->posY - center.posY;
+    double dz = rotatedPoint->posZ - center.posZ;
+
+    rotatedPoint->posX -= center.posX;
+    rotatedPoint->posY -= center.posY;
+    rotatedPoint->posZ -= center.posZ;
+
+    //X-tengely körüli forgatas:
+    if (rotX != 0) {
+        rotatedPoint->posY = dy * cos(rotX) - dz * sin(rotX);
+        rotatedPoint->posZ = dz * cos(rotX) + dy * sin(rotX);
     }
 
     //Y-tengely körüli forgatas:
     if (rotY != 0) {
-        rotatedPoint->posX = center.posX + dx * cos(rotY) + dz * sin(rotY);
-        rotatedPoint->posZ = center.posZ + dz * cos(rotY) - dx * sin(rotY);
+        rotatedPoint->posX = dx * cos(rotY) + dz * sin(rotY);
+        rotatedPoint->posZ = dz * cos(rotY) - dx * sin(rotY);
     }
 
     //Z-tengely körüli forgatas:
     if (rotZ != 0) {
-        rotatedPoint->posX = center.posX + dx * cos(rotZ) - dy * sin(rotZ);
-        rotatedPoint->posY = center.posY + dx * sin(rotZ) + dy * cos(rotZ);
+        rotatedPoint->posX = dx * cos(rotZ) - dy * sin(rotZ);
+        rotatedPoint->posY = dx * sin(rotZ) + dy * cos(rotZ);
     }
+
+    rotatedPoint->posX += center.posX;
+    rotatedPoint->posY += center.posY;
+    rotatedPoint->posZ += center.posZ;*/
 
     /*
     double dx = rotatedPoint->posX;

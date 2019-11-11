@@ -10,9 +10,12 @@
 #include "renderer.h"
 
 /*TODO
- * 1) Megnézni a hogy z tengely körüli forgatással miért vannak problémák/miért okoz problémákat.
- * 2) A z tengely beosztását az ellentetjérée változtatni (mármint ellenkeő irányba nőjjön/fogyjon..
+ * 1) Megnézni hogy z tengely körüli forgatással miért vannak problémák/miért okoz problémákat.
+ * 2) KÉSZ --- A z tengely beosztását az ellentetjérée változtatni (mármint ellenkeő irányba nőjjön/fogyjon..
  * 3) A háromszögek színeit (,ha adva vannak) is beolvasni a fájlból
+ * 4) KÉSZ --- A kamera (és feltehetőleg a sima) forgatás csak egy irányban működik huzamosabb idejig probléma nélkül - fix this
+ * 5) RenderDistance bevezetése és használata
+ * 6) RenderList készítése és sorba rendezése, majd használata
  * */
 
 //Screen dimension constants
@@ -48,9 +51,9 @@ int main( int argc, char* args[] ) {
 
     Camera cam;
 
-    cam.location.posX = 500;
-    cam.location.posY = 300;
-    cam.location.posZ = 500;
+    cam.location.posX = 330;
+    cam.location.posY = 100;
+    cam.location.posZ = 600;
     cam.distanceFromPlane = 500;
     cam.planeSizeX = SCREEN_WIDTH;
     cam.planeSizeY = SCREEN_HEIGHT;
@@ -164,23 +167,23 @@ int main( int argc, char* args[] ) {
 
         /*point.posX += x;
         point.posY += y;
-        point.posZ += z;
+        point.posZ -= z;
 
         p2.posX += x;
         p2.posY += y;
-        p2.posZ += z;
+        p2.posZ -= z;
 
         p3.posX += x;
         p3.posY += y;
-        p3.posZ += z;
+        p3.posZ -= z;
 
         p4.posX += x;
         p4.posY += y;
-        p4.posZ += z;*/
+        p4.posZ -= z;*/
 
         cam.location.posX += x;
         cam.location.posY += y;
-        cam.location.posZ += z;
+        cam.location.posZ -= z;
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
