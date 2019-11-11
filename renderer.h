@@ -12,7 +12,7 @@
 
 typedef struct Camera{Point location; int viewDistance; int planeSizeX; int planeSizeY; int distanceFromPlane; double rotX; double rotY; double rotZ} Camera;
 Point interRenderPoint(Camera cam, Point p);
-void renderTriangle(triangle triangle, Camera cam, SDL_Renderer *SDL_renderer);
+void renderTriangle(triangle tri, Camera cam, SDL_Renderer *SDL_renderer);
 void renderObject(Object object, Camera cam, SDL_Renderer *SDL_renderer);
 
 
