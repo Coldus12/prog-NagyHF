@@ -1,0 +1,3 @@
+/home/coldus/CLionProjects/Labor6/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/coldus/CLionProjects/Labor6/cmake-build-debug/CMakeFiles/Labor6.dir
+/home/coldus/CLionProjects/Labor6/cmake-build-debug/CMakeFiles/edit_cache.dir

@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/coldus/CLionProjects/kiserlet/main.c
+stdbool.h
+-
+stdlib.h
+-
+stdbool.h
+-
+stdio.h
+-
+string.h
+-
+math.h
+-
+

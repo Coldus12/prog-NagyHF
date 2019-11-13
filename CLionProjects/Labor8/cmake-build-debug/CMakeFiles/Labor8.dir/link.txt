@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/Labor8.dir/main.c.o  -o Labor8 

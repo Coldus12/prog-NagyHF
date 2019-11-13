@@ -1,0 +1,3 @@
+/home/coldus/CLionProjects/testing/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/coldus/CLionProjects/testing/cmake-build-debug/CMakeFiles/testing.dir
+/home/coldus/CLionProjects/testing/cmake-build-debug/CMakeFiles/edit_cache.dir
