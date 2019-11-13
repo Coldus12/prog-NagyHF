@@ -16,8 +16,40 @@ typedef struct Point{double posX; double posY; double posZ} Point;
 typedef struct triangle{Point p1; Point p2; Point p3; int r; int g; int b} triangle;
 typedef struct din_point_array{Point* points; int size} din_point_array;
 typedef struct din_triangle_array{triangle* triangles; int size} triangle_array;
+typedef struct din_bool_array{bool* boolean; int size} din_bool_array;
 typedef struct Model{triangle_array triangleArray} Model;
 typedef struct Object{Model model; Point location; double angle_from_x_axis; double angle_from_y_axis; double angle_from_z_axis} Object;
+
+
+//                                  din_bool_array
+//----------------------------------------------------------------------------------------------------------------------
+
+void init_bool_array(din_bool_array* din_array, int size) {
+    din_array->boolean = (bool*) calloc(size, sizeof(Point));
+    din_array->size = size;
+}
+
+bool resize_bool_array(din_bool_array *din_array, int new_size) {
+    bool *new_bool = (bool*) malloc(new_size * sizeof(bool));
+    if (new_bool == NULL) {
+        return false;
+    }
+    int min = new_size < din_array->size ? new_size : din_array->size;
+    for (int i = 0; i < min; i++) {
+        new_bool[i] = din_array->boolean[i];
+    }
+    free(din_array->boolean);
+    din_array->boolean = new_bool;
+    din_array->size = new_size;
+    return true;
+}
+
+void free_bool_array(din_bool_array* din_array) {
+    free(din_array->boolean);
+}
+
+//                                      din_point_array
+//----------------------------------------------------------------------------------------------------------------------
 
 void init_point_array(din_point_array* din_array, int size) {
     din_array->points = (Point*) calloc(size, sizeof(Point));
@@ -43,7 +75,8 @@ void free_point_array(din_point_array* din_array) {
     free(din_array->points);
 }
 
-//-----------------------------------------------------------------
+//                                         din_triangle_array
+//----------------------------------------------------------------------------------------------------------------------
 
 void init_triangle_array(triangle_array* din_array, int size) {
     din_array->triangles = (triangle*) calloc(size, sizeof(triangle));
@@ -69,7 +102,8 @@ void free_triangle_array(triangle_array* din_array) {
     free(din_array->triangles);
 }
 
-//----------------------------------------------------------------
+//                                     Objects, Models, and their functions
+//----------------------------------------------------------------------------------------------------------------------
 
 void free_model(Model *mod) {
     free(mod->triangleArray.triangles);
@@ -203,6 +237,11 @@ void move_Object_to_Point(Object *obj, Point point) {
     obj->location = point;
 }
 
+
+void free_object(Object *obj) {
+    free(obj->model.triangleArray.triangles);
+}
+
 Point weightPoint_of_triangle(triangle tri) {
     Point retP;
     retP.posX = (tri.p1.posX + tri.p2.posX + tri.p3.posX)/3;
@@ -216,6 +255,9 @@ double dist_btw_Points(Point p1, Point p2) {
     Point deltaP = {p2.posX - p1.posX, p2.posY - p1.posY, p2.posZ - p1.posZ};
     return  sqrt(deltaP.posX*deltaP.posX + deltaP.posY * deltaP.posY + deltaP.posZ * deltaP.posZ);
 }
+
+//                                          Rotation
+//----------------------------------------------------------------------------------------------------------------------
 
 Point rotate_Point_around_Point_wo_change(Point center, Point rotatedPoint, double rotX, double rotY, double rotZ) {
     Point returnP;
@@ -297,10 +339,6 @@ void rotate_Point_around_Point(Point center, Point *rotatedPoint, double rotX, d
     rotate_Point_around_Points_zAxis(center, rotatedPoint, rotZ);
 }
 
-void free_object(Object *obj) {
-    free(obj->model.triangleArray.triangles);
-}
-
 /* A haromszogek minden pontjat a center kozul elforgatjuk
  * a megfelelo szogben egyenkent, es igy az egesz objektum elfordul majd
  * */
@@ -312,5 +350,6 @@ void rotate_Object_around_Point(Point center, Object *obj, double rotX, double r
         rotate_Point_around_Point(center, &obj->model.triangleArray.triangles[i].p3, rotX, rotY, rotZ);
     }
 }
+//----------------------------------------------------------------------------------------------------------------------
 
 #endif

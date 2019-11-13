@@ -11,6 +11,13 @@ typedef struct Point{double posX; double posY; double posZ} Point;
 typedef struct triangle{Point p1; Point p2; Point p3; int r; int g; int b} triangle;
 typedef struct din_point_array{Point* points; int size} din_point_array;
 typedef struct din_triangle_array{triangle* triangles; int size} triangle_array;
+typedef struct din_bool_array{bool* boolean; int size} din_bool_array;
+
+//-----------------------------------------------------------------
+
+void init_bool_array(din_bool_array* din_array, int size);
+bool resize_bool_array(din_bool_array *din_array, int new_size);
+void free_bool_array(din_bool_array* din_array);
 
 //-----------------------------------------------------------------
 
