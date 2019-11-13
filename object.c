@@ -13,13 +13,11 @@
 #include <math.h>
 
 typedef struct Point{double posX; double posY; double posZ} Point;
-typedef struct triangle{Point p1; Point p2; Point p3} triangle;
+typedef struct triangle{Point p1; Point p2; Point p3; int r; int g; int b} triangle;
 typedef struct din_point_array{Point* points; int size} din_point_array;
 typedef struct din_triangle_array{triangle* triangles; int size} triangle_array;
 typedef struct Model{triangle_array triangleArray} Model;
 typedef struct Object{Model model; Point location; double angle_from_x_axis; double angle_from_y_axis; double angle_from_z_axis} Object;
-
-//typedef struct legalObject{triangle_array tri_array; Point location} legalObject;
 
 void init_point_array(din_point_array* din_array, int size) {
     din_array->points = (Point*) calloc(size, sizeof(Point));
@@ -97,9 +95,12 @@ void load_model_from_file(char *filename, Model *mod) {
         perror("Fajl megnyitasa sikertelen");
     }
 
-    char str[10], str2[10], str3[10], str4[10];
+    char str[10], str2[10], str3[10], str4[10], str5[10];
 
-    while (fscanf(fp, "%s %s %s %s", str, str2, str3, str4) != EOF) {
+    char line[100];
+    while(fgets(line,sizeof(line), fp) != NULL) {
+        int a = sscanf(line, "%s %s %s %s %s", str, str2, str3, str4, str5);
+
         if (str[0] == 'p') {
             int size = ++pArray.size;
             resize_point_array(&pArray, size);
@@ -109,15 +110,36 @@ void load_model_from_file(char *filename, Model *mod) {
             //printf("pont\n");
         } else if (strstr(str, "tri") != NULL) {
             resize_triangle_array(&tri_array, ++tri_array.size);
-            int a,b,c;
+            int x,y,z;
 
-            a = (int) strtol(str2+1, NULL, 10);
-            b = (int) strtol(str3+1, NULL, 10);
-            c = (int) strtol(str4+1, NULL, 10);
+            x = (int) strtol(str2+1, NULL, 10);
+            y = (int) strtol(str3+1, NULL, 10);
+            z = (int) strtol(str4+1, NULL, 10);
 
-            tri_array.triangles[tri_array.size-1].p1 = pArray.points[a-1];
-            tri_array.triangles[tri_array.size-1].p2 = pArray.points[b-1];
-            tri_array.triangles[tri_array.size-1].p3 = pArray.points[c-1];
+            tri_array.triangles[tri_array.size-1].p1 = pArray.points[x-1];
+            tri_array.triangles[tri_array.size-1].p2 = pArray.points[y-1];
+            tri_array.triangles[tri_array.size-1].p3 = pArray.points[z-1];
+
+            if (a < 5) {
+                tri_array.triangles[tri_array.size-1].r = 0;
+                tri_array.triangles[tri_array.size-1].g = 0;
+                tri_array.triangles[tri_array.size-1].b = 0;
+            } else {
+                char* temp = (char*) malloc(6*sizeof(char));
+
+                strncpy(temp, str5,2);
+                tri_array.triangles[tri_array.size-1].r = (int) strtol(temp, NULL, 16);
+
+                strncpy(temp, str5+2,2);
+                tri_array.triangles[tri_array.size-1].g = (int) strtol(temp, NULL, 16);
+
+                strncpy(temp, str5+4,2);
+                tri_array.triangles[tri_array.size-1].b = (int) strtol(temp, NULL, 16);
+
+                //printf("r: %d g: %d b: %d\n", tri_array.triangles[tri_array.size-1].r, tri_array.triangles[tri_array.size-1].g, tri_array.triangles[tri_array.size-1].b);
+
+                free(temp);
+            }
         }
     }
 
@@ -125,6 +147,7 @@ void load_model_from_file(char *filename, Model *mod) {
     for (int i = 0; i < tri_array.size; i++) {
         mod->triangleArray.triangles[i] = tri_array.triangles[i];
     }
+
     //mod->triangleArray.triangles = tri_array.triangles;
 
     fclose(fp);
@@ -180,15 +203,16 @@ void move_Object_to_Point(Object *obj, Point point) {
     obj->location = point;
 }
 
+Point weightPoint_of_triangle(triangle tri) {
+    Point retP;
+    retP.posX = (tri.p1.posX + tri.p2.posX + tri.p3.posX)/3;
+    retP.posY = (tri.p1.posY + tri.p2.posY + tri.p3.posY)/3;
+    retP.posZ = (tri.p1.posZ + tri.p2.posZ + tri.p3.posZ)/3;
+
+    return retP;
+}
+
 double dist_btw_Points(Point p1, Point p2) {
-    //Ket dimnezioban (x^2+y^2)^(1/2)
-    //delta X
-    //delta Y
-
-    //3D-ben
-    //X, Y, Z - A,B,C
-    //(x^2 + y^2 + z^2)^(1/2)
-
     Point deltaP = {p2.posX - p1.posX, p2.posY - p1.posY, p2.posZ - p1.posZ};
     return  sqrt(deltaP.posX*deltaP.posX + deltaP.posY * deltaP.posY + deltaP.posZ * deltaP.posZ);
 }
@@ -271,60 +295,6 @@ void rotate_Point_around_Point(Point center, Point *rotatedPoint, double rotX, d
     rotate_Point_around_Points_xAxis(center, rotatedPoint, rotX);
     rotate_Point_around_Points_yAxis(center, rotatedPoint, rotY);
     rotate_Point_around_Points_zAxis(center, rotatedPoint, rotZ);
-
-    /*double dx = rotatedPoint->posX - center.posX;
-    double dy = rotatedPoint->posY - center.posY;
-    double dz = rotatedPoint->posZ - center.posZ;
-
-    rotatedPoint->posX -= center.posX;
-    rotatedPoint->posY -= center.posY;
-    rotatedPoint->posZ -= center.posZ;
-
-    //X-tengely körüli forgatas:
-    if (rotX != 0) {
-        rotatedPoint->posY = dy * cos(rotX) - dz * sin(rotX);
-        rotatedPoint->posZ = dz * cos(rotX) + dy * sin(rotX);
-    }
-
-    //Y-tengely körüli forgatas:
-    if (rotY != 0) {
-        rotatedPoint->posX = dx * cos(rotY) + dz * sin(rotY);
-        rotatedPoint->posZ = dz * cos(rotY) - dx * sin(rotY);
-    }
-
-    //Z-tengely körüli forgatas:
-    if (rotZ != 0) {
-        rotatedPoint->posX = dx * cos(rotZ) - dy * sin(rotZ);
-        rotatedPoint->posY = dx * sin(rotZ) + dy * cos(rotZ);
-    }
-
-    rotatedPoint->posX += center.posX;
-    rotatedPoint->posY += center.posY;
-    rotatedPoint->posZ += center.posZ;*/
-
-    /*
-    double dx = rotatedPoint->posX;
-    double dy = rotatedPoint->posY;
-    double dz = rotatedPoint->posZ;
-
-    //X-tengely körüli forgatas:
-    if (rotX != 0) {
-        rotatedPoint->posY = dy * cos(rotX) - dz * sin(rotX);
-        rotatedPoint->posZ = dz * cos(rotX) + dy * sin(rotX);
-    }
-
-    //Y-tengely körüli forgatas:
-    if (rotY != 0) {
-        rotatedPoint->posX = dx * cos(rotY) + dz * sin(rotY);
-        rotatedPoint->posZ = dz * cos(rotY) - dx * sin(rotY);
-    }
-
-    //Z-tengely körüli forgatas:
-    if (rotZ != 0) {
-        rotatedPoint->posX = dx * cos(rotZ) - dy * sin(rotZ);
-        rotatedPoint->posY = dx * sin(rotZ) + dy * cos(rotZ);
-    }
-     */
 }
 
 void free_object(Object *obj) {
