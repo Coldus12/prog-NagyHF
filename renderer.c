@@ -9,6 +9,10 @@
 
 #include "object.h"
 
+//Debugmalloc:
+#include "debugmalloc-impl.h"
+#include "debugmalloc.h"
+
 typedef struct Camera{Point location; int viewDistance; int planeSizeX; int planeSizeY; int distanceFromPlane; double rotX; double rotY; double rotZ} Camera;
 
 /* Ha egy pont túl megy a síkon, akkor nem a renderelést

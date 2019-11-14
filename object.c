@@ -12,6 +12,10 @@
 #include <string.h>
 #include <math.h>
 
+//Debugmalloc:
+#include "debugmalloc-impl.h"
+#include "debugmalloc.h"
+
 typedef struct Point{double posX; double posY; double posZ} Point;
 typedef struct triangle{Point p1; Point p2; Point p3; int r; int g; int b} triangle;
 typedef struct din_point_array{Point* points; int size} din_point_array;
@@ -25,7 +29,7 @@ typedef struct Object{Model model; Point location; double angle_from_x_axis; dou
 //----------------------------------------------------------------------------------------------------------------------
 
 void init_bool_array(din_bool_array* din_array, int size) {
-    din_array->boolean = (bool*) calloc(size, sizeof(Point));
+    din_array->boolean = (bool*) malloc(size * sizeof(Point));
     din_array->size = size;
 }
 
@@ -34,8 +38,8 @@ bool resize_bool_array(din_bool_array *din_array, int new_size) {
     if (new_bool == NULL) {
         return false;
     }
-    int min = new_size < din_array->size ? new_size : din_array->size;
-    for (int i = 0; i < min; i++) {
+    //int min = new_size < din_array->size ? new_size : din_array->size;
+    for (int i = 0; i < din_array->size-1; i++) {
         new_bool[i] = din_array->boolean[i];
     }
     free(din_array->boolean);
@@ -52,7 +56,7 @@ void free_bool_array(din_bool_array* din_array) {
 //----------------------------------------------------------------------------------------------------------------------
 
 void init_point_array(din_point_array* din_array, int size) {
-    din_array->points = (Point*) calloc(size, sizeof(Point));
+    din_array->points = (Point*) malloc(size * sizeof(Point));
     din_array->size = size;
 }
 
@@ -61,10 +65,15 @@ bool resize_point_array(din_point_array *din_array, int new_size) {
     if (new_point == NULL) {
         return false;
     }
-    int min = new_size < din_array->size ? new_size : din_array->size;
-    for (int i = 0; i < min; i++) {
-        new_point[i] = din_array->points[i];
+
+
+    //int min = new_size < din_array->size ? new_size : din_array->size;
+
+
+    for (int i = 0; i < din_array->size-1; i++) {
+        new_point[i] = din_array->points[i]; //<--
     }
+
     free(din_array->points);
     din_array->points = new_point;
     din_array->size = new_size;
@@ -79,7 +88,7 @@ void free_point_array(din_point_array* din_array) {
 //----------------------------------------------------------------------------------------------------------------------
 
 void init_triangle_array(triangle_array* din_array, int size) {
-    din_array->triangles = (triangle*) calloc(size, sizeof(triangle));
+    din_array->triangles = (triangle*) malloc(size * sizeof(triangle));
     din_array->size = size;
 }
 
@@ -88,8 +97,9 @@ bool resize_triangle_array(triangle_array *din_array, int new_size) {
     if (new_tri == NULL) {
         return false;
     }
-    int min = new_size < din_array->size ? new_size : din_array->size;
-    for (int i = 0; i < min; i++) {
+    //int min = new_size < din_array->size ? new_size : din_array->size;
+
+    for (int i = 0; i < din_array->size-1; i++) {
         new_tri[i] = din_array->triangles[i];
     }
     free(din_array->triangles);

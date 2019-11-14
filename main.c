@@ -9,6 +9,10 @@
 #include "object.h"
 #include "renderer.h"
 
+//Debugmalloc:
+#include "debugmalloc-impl.h"
+#include "debugmalloc.h"
+
 /*TODO
  * 1) TALÁN--- Megnézni hogy z tengely körüli forgatással miért vannak problémák/miért okoz problémákat.
  * 2) KÉSZ --- A z tengely beosztását az ellentetjérée változtatni (mármint ellenkeő irányba nőjjön/fogyjon..

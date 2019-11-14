@@ -7,6 +7,10 @@
 
 #include <stdbool.h>
 
+/*//Debugmalloc:
+#include "debugmalloc-impl.h"
+#include "debugmalloc.h"*/
+
 typedef struct Point{double posX; double posY; double posZ} Point;
 typedef struct triangle{Point p1; Point p2; Point p3; int r; int g; int b} triangle;
 typedef struct din_point_array{Point* points; int size} din_point_array;

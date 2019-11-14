@@ -78,6 +78,12 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/home/coldus/CLionProjects/nagyHF/debugmalloc-impl.h">
+			<Option target="nagyHF"/>
+		</Unit>
+		<Unit filename="/home/coldus/CLionProjects/nagyHF/debugmalloc.h">
+			<Option target="nagyHF"/>
+		</Unit>
 		<Unit filename="/home/coldus/CLionProjects/nagyHF/main.c">
 			<Option target="nagyHF"/>
 		</Unit>
