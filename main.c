@@ -108,6 +108,11 @@ int main( int argc, char* args[] ) {
     cam.rotY = 0*degree;
     cam.rotZ = 0*degree;
 
+    RList *head = NULL;
+    head = addObjectRenderList(head, cam, &cube1);
+    head = addObjectRenderList(head, cam, &cube2);
+    head = addObjectRenderList(head, cam, &cube3);
+    head = addObjectRenderList(head, cam, &cube4);
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -215,10 +220,12 @@ int main( int argc, char* args[] ) {
         move_Object_to_Point(&cube4, p4);
 
 
-        renderObject(cube1, cam, renderer);
+        /*renderObject(cube1, cam, renderer);
         renderObject(cube2, cam, renderer);
         renderObject(cube3, cam, renderer);
-        renderObject(cube4, cam, renderer);
+        renderObject(cube4, cam, renderer);*/
+
+        render_RList(head, cam, renderer);
 
         SDL_RenderPresent(renderer);
         x = 0;
@@ -232,6 +239,8 @@ int main( int argc, char* args[] ) {
     SDL_DestroyWindow( window );
 
     //free(cube1.model.triangleArray.triangles);
+
+    freeList(head);
 
     free_object(&cube1);
     free_object(&cube2);

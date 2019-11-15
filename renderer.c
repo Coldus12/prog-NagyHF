@@ -23,46 +23,6 @@ typedef struct Camera{Point location; int viewDistance; int planeSizeX; int plan
  * amiben van sem lehet renderelni.
  * */
 
-typedef struct RenderList{triangle tri; double dist; bool visible; struct RenderList *next} RenderList;
-
-RenderList* addtoList(RenderList *head, triangle tri, double dist, bool visible) {
-    RenderList *newItem = (RenderList*) malloc(sizeof(RenderList));
-    newItem->next = head;
-    newItem->tri = tri;
-    newItem->dist = dist;
-    newItem->visible = visible;
-
-    return newItem;
-}
-
-void freeList(RenderList *head) {
-    RenderList *iter = head;
-    while (iter != NULL) {
-        RenderList *next = iter->next;
-        free(iter);
-        iter = next;
-    }
-}
-
-void orderList(RenderList *head) {
-    RenderList *current = head;
-    while (current != NULL) {
-        if (current->dist > current->next->dist) {
-            //RenderList *temp = cu
-        }
-    }
-
-}
-
-
-/*void init_render() {
-    RenderList renderList;
-    renderList.tri_array.size =
-}*/
-
-//Itt hogy ezeket be tudjam vezetni, mar map kell
-//Lofaszt
-
 Point interRenderPoint(Camera cam, Point p) {
 
     Point rotated;
@@ -110,7 +70,7 @@ void renderObject(Object object, Camera cam, SDL_Renderer *SDL_renderer) {
     }
 }
 
-void correctly_render_object(Object object, Camera cam, SDL_Renderer *SDL_renderer) {
+/*void correctly_render_object(Object object, Camera cam, SDL_Renderer *SDL_renderer) {
     RenderList *head = NULL;
 
     for (int i = 0; i < object.model.triangleArray.size; i++) {
@@ -118,6 +78,52 @@ void correctly_render_object(Object object, Camera cam, SDL_Renderer *SDL_render
     }
 
     freeList(head);
+}*/
+
+//                                              RenderList
+//----------------------------------------------------------------------------------------------------------------------
+typedef struct RenderList{triangle *tri; double dist; bool visible; struct RenderList *next} RList;
+
+RList* addtoRenderList(RList *head, triangle *tri, double dist, bool visible) {
+    RList *newItem = (RList*) malloc(sizeof(RList));
+    newItem->tri = tri;
+    newItem->dist = dist;
+    newItem->visible = visible;
+    newItem->next = head;
+
+    return newItem;
+}
+
+RList* addObjectRenderList(RList *head, Camera cam, Object *obj) {
+    for (int i = 0; i < obj->model.triangleArray.size; i++) {
+        head = addtoRenderList(head, &obj->model.triangleArray.triangles[i], dist_btw_Points(cam.location, weightPoint_of_triangle(obj->model.triangleArray.triangles[i])), true);
+    }
+    return head;
+}
+
+void freeList(RList *head) {
+    RList *iter = head;
+    while (iter != NULL) {
+        RList *next = iter->next;
+        free(iter);
+        iter = next;
+    }
+}
+
+void orderList(RList *head) {
+    RList *current = head;
+    while (current != NULL) {
+        //gyors rendezés láncolt listán
+        current = current->next;
+    }
+}
+
+void render_RList(RList *head, Camera cam, SDL_Renderer *SDL_Renderer) {
+    RList *current = head;
+    while (current != NULL) {
+        renderTriangle(*current->tri, cam, SDL_Renderer);
+        current = current->next;
+    }
 }
 
 
