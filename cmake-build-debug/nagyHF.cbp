@@ -87,6 +87,12 @@
 		<Unit filename="/home/coldus/CLionProjects/nagyHF/main.c">
 			<Option target="nagyHF"/>
 		</Unit>
+		<Unit filename="/home/coldus/CLionProjects/nagyHF/map.c">
+			<Option target="nagyHF"/>
+		</Unit>
+		<Unit filename="/home/coldus/CLionProjects/nagyHF/map.h">
+			<Option target="nagyHF"/>
+		</Unit>
 		<Unit filename="/home/coldus/CLionProjects/nagyHF/object.c">
 			<Option target="nagyHF"/>
 		</Unit>

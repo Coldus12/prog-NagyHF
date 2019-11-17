@@ -3,7 +3,7 @@ project(nagyHF C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(nagyHF debugmalloc.h debugmalloc-impl.h main.c object.c object.h renderer.c renderer.h)
+add_executable(nagyHF debugmalloc.h debugmalloc-impl.h main.c object.c object.h renderer.c renderer.h map.c map.h)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
 

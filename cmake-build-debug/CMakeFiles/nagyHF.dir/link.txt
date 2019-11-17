@@ -1,1 +1,1 @@
-/usr/bin/cc -g   CMakeFiles/nagyHF.dir/main.c.o CMakeFiles/nagyHF.dir/object.c.o CMakeFiles/nagyHF.dir/renderer.c.o  -o nagyHF /usr/lib/libSDL2main.a /usr/lib/libSDL2.so -lpthread -lpthread /usr/lib/libSDL2_image.so /usr/lib/libSDL2_gfx.so -lm 
+/usr/bin/cc -g   CMakeFiles/nagyHF.dir/main.c.o CMakeFiles/nagyHF.dir/object.c.o CMakeFiles/nagyHF.dir/renderer.c.o CMakeFiles/nagyHF.dir/map.c.o  -o nagyHF /usr/lib/libSDL2main.a /usr/lib/libSDL2.so -lpthread -lpthread /usr/lib/libSDL2_image.so /usr/lib/libSDL2_gfx.so -lm 

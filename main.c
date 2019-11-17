@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include "object.h"
 #include "renderer.h"
+#include "map.h"
 
 //Debugmalloc:
 #include "debugmalloc-impl.h"
@@ -23,8 +24,11 @@
  * */
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+/*const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;*/
+
+const int SCREEN_WIDTH = 1280;
+const int SCREEN_HEIGHT = 960;
 
 int main( int argc, char* args[] ) {
     //The window we'll be rendering to
@@ -66,7 +70,7 @@ int main( int argc, char* args[] ) {
     //Objektum innen
     //------------------------------------------------------------------------------------------------------------------
     Model cube;
-    load_model_from_file("/home/coldus/Desktop/cube.txt", &cube);
+    load_model_from_file("cube.txt", &cube);
     //Point point;
 
     Object cube1, cube2, cube3, cube4;
@@ -116,6 +120,10 @@ int main( int argc, char* args[] ) {
     head = addObjectRenderList(head, cam, &cube4);
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+
+    //object_list *hobj = NULL;
+    //load_map_from_file("/home/coldus/Desktop/map.txt",hobj);
 
     for(bool keep_running = true; keep_running;) {
         for(SDL_Event ev; SDL_PollEvent(&ev);) {
@@ -250,6 +258,9 @@ int main( int argc, char* args[] ) {
     free_model(&cube);
 
     printf("BYE\n");
+    //load_map_from_file("/home/coldus/Desktop/map.txt",NULL);
+    //free_object_list(hobj);
+
     //Quit SDL subsystems
     SDL_Quit();
 

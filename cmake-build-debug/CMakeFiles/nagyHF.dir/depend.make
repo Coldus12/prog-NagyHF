@@ -4,6 +4,7 @@
 CMakeFiles/nagyHF.dir/main.c.o: ../debugmalloc-impl.h
 CMakeFiles/nagyHF.dir/main.c.o: ../debugmalloc.h
 CMakeFiles/nagyHF.dir/main.c.o: ../main.c
+CMakeFiles/nagyHF.dir/main.c.o: ../map.h
 CMakeFiles/nagyHF.dir/main.c.o: ../object.h
 CMakeFiles/nagyHF.dir/main.c.o: ../renderer.h
 CMakeFiles/nagyHF.dir/main.c.o: /usr/include/SDL2/SDL.h
@@ -52,6 +53,11 @@ CMakeFiles/nagyHF.dir/main.c.o: /usr/include/SDL2/SDL_version.h
 CMakeFiles/nagyHF.dir/main.c.o: /usr/include/SDL2/SDL_video.h
 CMakeFiles/nagyHF.dir/main.c.o: /usr/include/SDL2/begin_code.h
 CMakeFiles/nagyHF.dir/main.c.o: /usr/include/SDL2/close_code.h
+
+CMakeFiles/nagyHF.dir/map.c.o: ../debugmalloc-impl.h
+CMakeFiles/nagyHF.dir/map.c.o: ../debugmalloc.h
+CMakeFiles/nagyHF.dir/map.c.o: ../map.c
+CMakeFiles/nagyHF.dir/map.c.o: ../object.h
 
 CMakeFiles/nagyHF.dir/object.c.o: ../debugmalloc-impl.h
 CMakeFiles/nagyHF.dir/object.c.o: ../debugmalloc.h

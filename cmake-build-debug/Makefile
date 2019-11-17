@@ -150,6 +150,33 @@ main.c.s:
 	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/main.c.s
 .PHONY : main.c.s
 
+map.o: map.c.o
+
+.PHONY : map.o
+
+# target to build an object file
+map.c.o:
+	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/map.c.o
+.PHONY : map.c.o
+
+map.i: map.c.i
+
+.PHONY : map.i
+
+# target to preprocess a source file
+map.c.i:
+	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/map.c.i
+.PHONY : map.c.i
+
+map.s: map.c.s
+
+.PHONY : map.s
+
+# target to generate assembly for a file
+map.c.s:
+	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/map.c.s
+.PHONY : map.c.s
+
 object.o: object.c.o
 
 .PHONY : object.o
@@ -216,6 +243,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... map.o"
+	@echo "... map.i"
+	@echo "... map.s"
 	@echo "... object.o"
 	@echo "... object.i"
 	@echo "... object.s"

@@ -5,6 +5,7 @@ CMakeFiles/nagyHF.dir/main.c.o
  /home/coldus/CLionProjects/nagyHF/debugmalloc-impl.h
  /home/coldus/CLionProjects/nagyHF/debugmalloc.h
  /home/coldus/CLionProjects/nagyHF/main.c
+ /home/coldus/CLionProjects/nagyHF/map.h
  /home/coldus/CLionProjects/nagyHF/object.h
  /home/coldus/CLionProjects/nagyHF/renderer.h
  /usr/include/SDL2/SDL.h
@@ -53,6 +54,11 @@ CMakeFiles/nagyHF.dir/main.c.o
  /usr/include/SDL2/SDL_video.h
  /usr/include/SDL2/begin_code.h
  /usr/include/SDL2/close_code.h
+CMakeFiles/nagyHF.dir/map.c.o
+ /home/coldus/CLionProjects/nagyHF/debugmalloc-impl.h
+ /home/coldus/CLionProjects/nagyHF/debugmalloc.h
+ /home/coldus/CLionProjects/nagyHF/map.c
+ /home/coldus/CLionProjects/nagyHF/object.h
 CMakeFiles/nagyHF.dir/object.c.o
  /home/coldus/CLionProjects/nagyHF/debugmalloc-impl.h
  /home/coldus/CLionProjects/nagyHF/debugmalloc.h
