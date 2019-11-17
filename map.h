@@ -7,7 +7,6 @@
 typedef struct object_list{Object obj; struct object_list *next} object_list;
 typedef struct model_list{Model model; char name[50]; struct model_list *next} model_list;
 
-
 object_list* add_to_object_list(object_list *head, Object obj);
 void free_object_list(object_list *head);
 model_list* add_to_model_list(model_list *head, char* name,Model model);

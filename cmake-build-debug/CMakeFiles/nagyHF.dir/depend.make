@@ -4,7 +4,6 @@
 CMakeFiles/nagyHF.dir/main.c.o: ../debugmalloc-impl.h
 CMakeFiles/nagyHF.dir/main.c.o: ../debugmalloc.h
 CMakeFiles/nagyHF.dir/main.c.o: ../main.c
-CMakeFiles/nagyHF.dir/main.c.o: ../map.h
 CMakeFiles/nagyHF.dir/main.c.o: ../object.h
 CMakeFiles/nagyHF.dir/main.c.o: ../renderer.h
 CMakeFiles/nagyHF.dir/main.c.o: /usr/include/SDL2/SDL.h
