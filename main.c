@@ -18,8 +18,8 @@
  * 2) KÉSZ --- A z tengely beosztását az ellentetjérée változtatni (mármint ellenkeő irányba nőjjön/fogyjon..
  * 3) KÉSZ --- A háromszögek színeit (,ha adva vannak) is beolvasni a fájlból
  * 4) KÉSZ --- A kamera (és feltehetőleg a sima) forgatás csak egy irányban működik huzamosabb idejig probléma nélkül - fix this
- * 5) RenderDistance bevezetése és használata
- * 6) RenderList készítése és sorba rendezése, majd használata
+ * 5) KÉSZ --- RenderDistance bevezetése és használata
+ * 6) KÉSZ --- RenderList készítése és sorba rendezése, majd használata
  * */
 
 //Screen dimension constants
@@ -61,6 +61,7 @@ int main( int argc, char* args[] ) {
     cam.distanceFromPlane = 500;
     cam.planeSizeX = SCREEN_WIDTH;
     cam.planeSizeY = SCREEN_HEIGHT;
+    cam.viewDistance = 1000;
 
     //Objektum innen
     //------------------------------------------------------------------------------------------------------------------
@@ -225,7 +226,7 @@ int main( int argc, char* args[] ) {
         renderObject(cube3, cam, renderer);
         renderObject(cube4, cam, renderer);*/
 
-        render_RList(head, cam, renderer);
+        head = render_RList(head, cam, renderer);
 
         SDL_RenderPresent(renderer);
         x = 0;

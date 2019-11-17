@@ -26,7 +26,8 @@ RList* addtoRenderList(RList *head, triangle *tri, double dist, bool visible);
 RList* addObjectRenderList(RList *head, Camera cam, Object *obj);
 void freeList(RList *head);
 void orderList(RList *head);
-void render_RList(RList *head, Camera cam, SDL_Renderer *SDL_Renderer);
+RList* update_distances(RList* head, Camera cam);
+RList* render_RList(RList *head, Camera cam, SDL_Renderer *SDL_Renderer);
 
 
 #endif //NAGYHF_RENDERER_H

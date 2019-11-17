@@ -56,11 +56,13 @@ void renderTriangle(triangle tri, Camera cam, SDL_Renderer *SDL_renderer) {
 
     //printf("%d %d %d\n", tri.r, tri.g, tri.b);
 
-    if (p1.posZ != -1 && p2.posZ != -1 && p3.posZ != -1)
+    if (p1.posZ != -1 && p2.posZ != -1 && p3.posZ != -1) {
         filledTrigonRGBA(SDL_renderer, p1.posX, p1.posY, p2.posX, p2.posY, p3.posX, p3.posY, tri.r, tri.g, tri.b, 255);
-    //trigonRGBA(SDL_renderer, p1.posX, p1.posY, p2.posX, p2.posY, p3.posX, p3.posY, tri.r, tri.g, tri.b, 255);
+        //trigonRGBA(SDL_renderer, p1.posX, p1.posY, p2.posX, p2.posY, p3.posX, p3.posY, tri.r, tri.g, tri.b, 255);
+    }
 }
 
+//Külön RenderList-en kívűli renderelés
 void renderObject(Object object, Camera cam, SDL_Renderer *SDL_renderer) {
     //order_tri_array(cam, &object);
     int a = object.model.triangleArray.size;
@@ -69,16 +71,6 @@ void renderObject(Object object, Camera cam, SDL_Renderer *SDL_renderer) {
         renderTriangle(object.model.triangleArray.triangles[i], cam, SDL_renderer);
     }
 }
-
-/*void correctly_render_object(Object object, Camera cam, SDL_Renderer *SDL_renderer) {
-    RenderList *head = NULL;
-
-    for (int i = 0; i < object.model.triangleArray.size; i++) {
-        head = addtoList(head, object.model.triangleArray.triangles[i], dist_btw_Points(cam.location, weightPoint_of_triangle(object.model.triangleArray.triangles[i])), true);
-    }
-
-    freeList(head);
-}*/
 
 //                                              RenderList
 //----------------------------------------------------------------------------------------------------------------------
@@ -110,20 +102,138 @@ void freeList(RList *head) {
     }
 }
 
-void orderList(RList *head) {
-    RList *current = head;
-    while (current != NULL) {
-        //gyors rendezés láncolt listán
+//                                    Lista rendezése, és hozzátartozó függvények
+//----------------------------------------------------------------------------------------------------------------------
+
+RList* getListItem(RList* head, int posInList) {
+    RList* current = head;
+    for (int i = 0; i < posInList; i++) {
         current = current->next;
     }
+    return current;
 }
 
-void render_RList(RList *head, Camera cam, SDL_Renderer *SDL_Renderer) {
+RList* swap(RList *head, int pos1, int pos2) {
+    RList *ret = head;
+    RList *prev1, *prev2, *c1, *c2;
+
+    if (abs(pos1-pos2) > 1) {
+        if (pos1 == 0) {
+            prev2 = getListItem(head, pos2-1);
+            c1 = head;
+            c2 = prev2->next;
+            ret = c2;
+
+            prev2->next = c1;
+
+            RList* temp = c1->next;
+            c1->next = c2->next;
+            c2->next = temp;
+        } else if (pos2 == 0) {
+            prev1 = getListItem(head, pos1-1);
+            c2 = head;
+            c1 = prev1->next;
+            ret = c1;
+
+            prev1->next = c2;
+
+            RList* temp = c2->next;
+            c2->next = c1->next;
+            c1->next = temp;
+        } else {
+            prev1 = getListItem(head, pos1-1);
+            prev2 = getListItem(head, pos2-1);
+
+            c1 = prev1->next;
+            c2 = prev2->next;
+
+            RList* temp = c1->next;
+            c1->next = c2->next;
+            c2->next = temp;
+
+            prev1->next = c2;
+            prev2->next = c1;
+            ret = head;
+        }
+    } else if (pos1 == pos2) {
+        return  head;
+    } else {
+        if (pos1 == 0 || pos2 == 0) {
+            c1 = getListItem(head, 0);
+            c2 = c1->next;
+
+            //RList *temp;
+            c1->next = c2->next;
+            c2->next = c1;
+            head = c2;
+
+            return head;
+        } else {
+            if (pos1 > pos2) {
+                prev2 = getListItem(head, pos2-1);
+            } else {
+                prev2 = getListItem(head, pos1-1);
+            }
+
+            c1 = prev2->next->next;
+            c2 = prev2->next;
+
+            RList *temp = c1->next;
+            c1->next = c2;
+            c2->next = temp;
+
+            prev2->next = c1;
+            return head;
+        }
+    }
+
+    return ret;
+}
+
+RList* bubble_sort_by_dist(RList *head) {
+    int size = 0;
     RList *current = head;
     while (current != NULL) {
+        size++;
+        current = current->next;
+    }
+
+    for (int i = size-1; i > 0; --i) {
+        for (int j = 0; j < i; ++j) {
+            if (getListItem(head, i)->dist >= getListItem(head, j)->dist) {
+                head = swap(head, i, j);
+            }
+        }
+    }
+
+    return head;
+}
+
+RList* update_distances(RList* head, Camera cam) {
+    RList *current = head;
+    while (current != NULL) {
+        current->dist = dist_btw_Points(cam.location, weightPoint_of_triangle(*current->tri));
+        current = current->next;
+    }
+    return head;
+}
+
+//                                      RList render függvénye
+//----------------------------------------------------------------------------------------------------------------------
+
+RList* render_RList(RList *head, Camera cam, SDL_Renderer *SDL_Renderer) {
+    head = update_distances(head, cam);
+    head = bubble_sort_by_dist(head);
+    RList *current = head;
+    while (current != NULL) {
+        if (current->dist > cam.viewDistance) {
+            return head;
+        }
         renderTriangle(*current->tri, cam, SDL_Renderer);
         current = current->next;
     }
+
+    return head;
 }
 
 
