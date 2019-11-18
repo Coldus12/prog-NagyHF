@@ -25,7 +25,7 @@ typedef struct Object{Model model; Point location; double angle_from_x_axis; dou
 
 //                                      din_point_array
 //----------------------------------------------------------------------------------------------------------------------
-/* Dinamikus pont-tömb, tulajdonképpen csak arra szolgál hogy eltárolja a pontokat addig, amíg még
+/*! Dinamikus pont-tömb, tulajdonképpen csak arra szolgál hogy eltárolja a pontokat addig, amíg még
  * nem raktuk őket háromszögekbe, és azokat nem raktuk még Model-be.
  * */
 
@@ -56,7 +56,7 @@ void free_point_array(din_point_array* din_array) {
 
 //                                         din_triangle_array
 //----------------------------------------------------------------------------------------------------------------------
-/* Dinamikus háromszög tömb.
+/*! Dinamikus háromszög tömb.
  * Nem igazán lehet róla több érdemleges dolgot elmondani. Gyakorlatilag mindenhez ezt használjuk.
  * */
 
@@ -87,7 +87,7 @@ void free_triangle_array(triangle_array* din_array) {
 
 //                                     Objektumok, Modelek, és a függvényeik
 //----------------------------------------------------------------------------------------------------------------------
-/* Mind a Model, mind az Objektum rendelkezik egy dinamikus háromszög-tömbbel, és el lehetne mondani azt,
+/*! Mind a Model, mind az Objektum rendelkezik egy dinamikus háromszög-tömbbel, és el lehetne mondani azt,
  * hogy valójában mind a kettő csak egy dinamikus háromszög tömb. Akkor viszont miért van szükség arra, hogy
  * külön struktúráik és függvényeik legyenek?
  *
@@ -100,7 +100,7 @@ void free_model(Model *mod) {
     free(mod->triangleArray.triangles);
 }
 
-/* A load_model_from_file függvény feladata az, hogy fájlnév alapján töltse bele a fájl adatait egy Model struktúrába.
+/*! A load_model_from_file függvény feladata az, hogy fájlnév alapján töltse bele a fájl adatait egy Model struktúrába.
  * Eredetileg fscanf függvényt használtam volna itt, de az sajnos nem működik jól, ha folyamatosan több dolgot kérünk
  * hogy olvasson be, de annál csak kevesebbet.
  * Így fgets-et használok, ami soronként halad, majd a sort sscanf()-el dolgozom fel.
@@ -177,7 +177,7 @@ void load_model_from_file(char *filename, Model *mod) {
     free_point_array(&pArray);
 }
 
-/* A load_Model_into_Object függvény betölt bemásolja egy Model adatait egy Objektumba oly módon, hogy
+/*! A load_Model_into_Object függvény betölt bemásolja egy Model adatait egy Objektumba oly módon, hogy
  * már figyel arra, hogy a 0,0,0 referencia pont az objektum saját koordinátáihoz illeszti oda a Modelt,
  * így annak minden pontja jó helyre kerül.
  *
@@ -207,7 +207,7 @@ void load_Model_into_Object(Object *obj, Model model) {
     }
 }
 
-/* A move_Object_to_Point függvény az objektum összes pontját eltolja úgy, hogy megnézi milyen irányban
+/*! A move_Object_to_Point függvény az objektum összes pontját eltolja úgy, hogy megnézi milyen irányban
  * mozdul el az objektum helypontja, és ezzel a "vektorral" tolja el az objektum összes többi pontját is.
  * */
 void move_Object_to_Point(Object *obj, Point point) {
@@ -238,7 +238,7 @@ void free_object(Object *obj) {
     free(obj->model.triangleArray.triangles);
 }
 
-/* A centroid_of_triangle függvény egy háromszög súlypontját számolja ki, majd adja vissza.
+/*! A centroid_of_triangle függvény egy háromszög súlypontját számolja ki, majd adja vissza.
  * Az ebből a függvényből származó pontot használjuk ahhoz, hogy távolságot számoljunk a
  * kamerától, majd a távolság alapján rendezzük a RenderList-et.
  * */
@@ -251,7 +251,7 @@ Point centroid_of_triangle(triangle tri) {
     return retP;
 }
 
-/* A dist_btw_Points függvény két pont távolságát számolja ki, és adja vissza.
+/*! A dist_btw_Points függvény két pont távolságát számolja ki, és adja vissza.
  * */
 double dist_btw_Points(Point p1, Point p2) {
     Point deltaP = {p2.posX - p1.posX, p2.posY - p1.posY, p2.posZ - p1.posZ};
@@ -260,7 +260,7 @@ double dist_btw_Points(Point p1, Point p2) {
 
 //                                          Forgatás
 //----------------------------------------------------------------------------------------------------------------------
-/* A pont körüli forgatás valójában itt a pont tengelyei körüli forgatást jelent, és valójában úgy néz ki,
+/*! A pont körüli forgatás valójában itt a pont tengelyei körüli forgatást jelent, és valójában úgy néz ki,
  * hogy először a forgatandó pontot "eltoljuk az origóba", azaz a koordinátáiból kivonjuk annak a pontnak
  * a koordinátáit, ami körül forgatjuk. Majd az így kapott pontot forgatjuk az origo x, y, z tengelyei körül
  * forgatási mátrixok használatával. Valójában mivel sem vektorokat sem mátrixokat nem vezettünk be, így
@@ -319,7 +319,7 @@ void rotate_Point_around_Points_zAxis(Point center, Point *rotatedPoint, double 
     rotatedPoint->posY += center.posY;
 }
 
-/* Amikor egy pontot mind a három tengelye körül forgatunk, akkor külön-külön egymás után forgajtuk el
+/*! Amikor egy pontot mind a három tengelye körül forgatunk, akkor külön-külön egymás után forgajtuk el
  * a pontot a tengelyek körül.
  * */
 void rotate_Point_around_Point(Point center, Point *rotatedPoint, double rotX, double rotY, double rotZ) {
@@ -328,7 +328,7 @@ void rotate_Point_around_Point(Point center, Point *rotatedPoint, double rotX, d
     rotate_Point_around_Points_zAxis(center, rotatedPoint, rotZ);
 }
 
-/* A haromszogek minden pontjat a center kozul elforgatjuk
+/*! A haromszogek minden pontjat a center kozul elforgatjuk
  * a megfelelo szogben egyenkent, es igy az egesz objektum elfordul majd
  * */
 

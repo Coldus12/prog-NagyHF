@@ -15,7 +15,13 @@
 
 typedef struct Camera{Point location; int viewDistance; int planeSizeX; int planeSizeY; int distanceFromPlane; double rotX; double rotY; double rotZ} Camera;
 
-/* Az "interRenderPoint" a program egyik, ha nem a legfontosabb függvénye.
+/*TODO
+ * A megjelenítéssel problémák vannak, mert ha a kamera az alsó háromszög súlypontjának magasságához (y tengelyen)
+ * van közelebb (mintha az oldalsó háromszögek súlypontjához lenne), akkor az alsó háromszög egy kis része látszani fog...
+ * Ez javítandó... Kérdés, hogy hogyan...
+ * */
+
+/*!Az "interRenderPoint" a program egyik, ha nem a legfontosabb függvénye.
  * Ez a függvény felel azért, hogy a pontok amelyek a térben vannak a Camera
  * által meghatározott síkra legyenek vetítve.
  *
@@ -40,7 +46,7 @@ Point interRenderPoint(Camera cam, Point p) {
     Point rotated;
     rotated = p;
 
-    /* Az interRenderPoint függvényben a pontot még mielőtt "rávetítenénk" a síkra
+    /*! Az interRenderPoint függvényben a pontot még mielőtt "rávetítenénk" a síkra
      * előbb elforgatjuk. Ezt azért tesszük, mert a kamerát valójában nem forgatjuk,
      * hanem ha a kamera forog, akkor mindennek a képét elforgatjuk úgy, mintha a kamera
      * forgott volna.
@@ -61,7 +67,7 @@ Point interRenderPoint(Camera cam, Point p) {
     if (rotated.posZ - cam.location.posZ <= 0) {
         vetulet.posZ = -1;
     } else {
-        /* Természetesen a képernyő úgy működik, hogy a bal-felső sarka a 0,0 pont,
+        /*! Természetesen a képernyő úgy működik, hogy a bal-felső sarka a 0,0 pont,
          * és lefelé megy az y tengely, és jobbra az x tengely, így ahhoz, hogy a koordináták
          * jók legyenek, át kell alakítanunk őket oly módon, hogy eddig a képernyő (ebben az esetben
          * az ablak) kozéppontját vettük a origónak, és az y tengely fölfelé mutatott.
@@ -78,7 +84,7 @@ Point interRenderPoint(Camera cam, Point p) {
     return vetulet;
 }
 
-/* A renderTriangle függvény felelős azért hogy ne csak pontokat, hanem háromszögeket
+/*! A renderTriangle függvény felelős azért hogy ne csak pontokat, hanem háromszögeket
  * (amikből tulajdonképpen minden objuktum felépül) is megtudjunk jeleníteni.
  * Ez a függvény úgy működik, hogy vesszük a háromszög három pontját, majd mind a háromra
  * lefuttatjuk az interRenderPoint függvényt, majd az így kapott három pontra rajzoljuk
@@ -99,7 +105,7 @@ void renderTriangle(triangle tri, Camera cam, SDL_Renderer *SDL_renderer) {
 }
 
 //Külön, RenderList-en kívűli objektum renderelése
-/* A renderObject függvény arra szolgál, hogy egy objektumot külön jelenítsünk meg.
+/*! A renderObject függvény arra szolgál, hogy egy objektumot külön jelenítsünk meg.
  * Ebben a függvényben nincs rendezés, így a háromszögeket mindig abban a sorrendben
  * fogja kirajzoni, amiben az Modelbe be lettek olvasva.
  * Ezt a függvény nem érdemes használni, csak akkor, ha wireframe-ben jelenítjük
@@ -114,7 +120,7 @@ void renderObject(Object object, Camera cam, SDL_Renderer *SDL_renderer) {
 
 //                                              RenderList
 //----------------------------------------------------------------------------------------------------------------------
-/* A RenderList struktúrára azért van szükség, mert sokkal egyszerűbb ha minden amit
+/*! A RenderList struktúrára azért van szükség, mert sokkal egyszerűbb ha minden amit
  * megszeretnénk jeleníteni egy helyen van, és így nem kell egyenként minden objektumot, vagy kósza
  * háromszöget megjeleníteni, hanem elég ha egy a RenderList-en haladunk végig, és rajzoljuk ki a dolgokat.
  *
@@ -124,7 +130,7 @@ void renderObject(Object object, Camera cam, SDL_Renderer *SDL_renderer) {
  * */
 typedef struct RenderList{triangle *tri; double dist; bool visible; struct RenderList *next} RList;
 
-/* Az addtoRenderList függvény képes hozzáadni háromszögeket a RenderListhez.
+/*! Az addtoRenderList függvény képes hozzáadni háromszögeket a RenderListhez.
  * */
 RList* addtoRenderList(RList *head, triangle *tri, double dist, bool visible) {
     RList *newItem = (RList*) malloc(sizeof(RList));
@@ -136,7 +142,7 @@ RList* addtoRenderList(RList *head, triangle *tri, double dist, bool visible) {
     return newItem;
 }
 
-/* Az addObjectToRenderList függvény végig halad egy objektum összes háromszögén, és azoknak a memória címét adja hozzá
+/*! Az addObjectToRenderList függvény végig halad egy objektum összes háromszögén, és azoknak a memória címét adja hozzá
  * a RenderList-hez. Ez azért fontos, hogy memória címet ad oda, mert így ha a háromszög pozíciója változik, akkor a
  * kirajzolt helyzete is változik.
  * */
@@ -159,7 +165,7 @@ void freeList(RList *head) {
 //                                    Lista rendezése, és hozzátartozó függvények
 //----------------------------------------------------------------------------------------------------------------------
 
-/* Feltehetőleg nem egy kifejezetten effektív függvény, de egyelőre nem tudom, hogyan lehetne kikerülni a használatát.
+/*! Feltehetőleg nem egy kifejezetten effektív függvény, de egyelőre nem tudom, hogyan lehetne kikerülni a használatát.
  * Ennek a függvénynek az a dolga, hogy keresztül szalad egy láncolt listán addig amíg el nem éri az X-edik elemet
  * majd azt az elemet adja vissza.
  *
@@ -174,7 +180,7 @@ RList* getListItem(RList* head, int posInList) {
     return current;
 }
 
-/* A swap függvény feladata, ahogy arra a neve is utal az, hogy egy láncolt listában (jelen esetben RenderListen)
+/*! A swap függvény feladata, ahogy arra a neve is utal az, hogy egy láncolt listában (jelen esetben RenderListen)
  * két tetszőleges elemet kicseréljünk.
  *
  * Ehhez alap esetben legalább 4 pointer kell, 2 ami azokra az elemekre mutat, amiket ki szeretnénk cserélni,
@@ -275,7 +281,7 @@ RList* swap(RList *head, int pos1, int pos2) {
 }
 
 
-/* A lista rendezése fontos, hiszen ha nincs rendezve, akkor lehet hogy kamerától távolabbi dolgokat
+/*! A lista rendezése fontos, hiszen ha nincs rendezve, akkor lehet hogy kamerától távolabbi dolgokat
  * a kamerához közeli dolgokra rajzolunk.
  * Egyelőre a rendezés buborék rendezéssel van megoldva, ezt később ki szeretném cserélni, mert
  * valószínűleg nagyban lassítja a programot, főleg úgy, hogy itt a rendezésnél nagyon sokszor használjuk
@@ -306,7 +312,7 @@ RList* bubble_sort_by_dist(RList *head) {
     return head;
 }
 
-/* Az update_distances függvényre azért van szükség, mert ha a kamera, vagy egy objektum helyzete
+/*! Az update_distances függvényre azért van szükség, mert ha a kamera, vagy egy objektum helyzete
  * megváltozik, akkor a kettőjük közti távolsága is megváltozik, és ez alaján lehet, hogy a lista
  * sorrendjén is változtatni kell, így elengedhetetlen, hogy a RenderList megjelenítése elött
  * a távolságokat újra megvizsgáljuk, majd, ha szükséges rendezzük a listát.
@@ -322,7 +328,7 @@ RList* update_distances(RList* head, Camera cam) {
 
 //                                      RList render függvénye
 //----------------------------------------------------------------------------------------------------------------------
-/* A render_RList függvény azt csinálja, amit a neve is sugall. Megjeleníti a RenderList-ben szereplő
+/*! A render_RList függvény azt csinálja, amit a neve is sugall. Megjeleníti a RenderList-ben szereplő
  * háromszögeket a távolságuk alapján csökkenő sorrendben.
  *
  * Viszont még mielőtt ezt megtenné, először rendezi frissíti a háromszögek kamerától mért távolságát,

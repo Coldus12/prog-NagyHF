@@ -59,7 +59,7 @@ int main( int argc, char* args[] ) {
     cube1.location.posY = 100;
     cube1.location.posZ = 300;
 
-    cube2.location.posX = 300;
+    /*cube2.location.posX = 300;
     cube2.location.posY = 100;
     cube2.location.posZ = 300;
 
@@ -69,12 +69,12 @@ int main( int argc, char* args[] ) {
 
     cube4.location.posX = 300;
     cube4.location.posY = 100;
-    cube4.location.posZ = 300;
+    cube4.location.posZ = 300;*/
 
     load_Model_into_Object(&cube1, cube);
-    load_Model_into_Object(&cube2, cube);
+    /*load_Model_into_Object(&cube2, cube);
     load_Model_into_Object(&cube3, cube);
-    load_Model_into_Object(&cube4, cube);
+    load_Model_into_Object(&cube4, cube);*/
 
     //                             Objektum, és a kamera kezdeti értékeinek beállítása
     //------------------------------------------------------------------------------------------------------------------
@@ -89,17 +89,17 @@ int main( int argc, char* args[] ) {
     cam.rotZ = 0*degree;
 
     move_Object_to_Point(&cube1,point);
-    move_Object_to_Point(&cube2, p2);
+    /*move_Object_to_Point(&cube2, p2);
     move_Object_to_Point(&cube3, p3);
-    move_Object_to_Point(&cube4, p4);
+    move_Object_to_Point(&cube4, p4);*/
 
     //                                                  RenderList
     //------------------------------------------------------------------------------------------------------------------
     RList *head = NULL;
     head = addObjectToRenderList(head, cam, &cube1);
-    head = addObjectToRenderList(head, cam, &cube2);
+    /*head = addObjectToRenderList(head, cam, &cube2);
     head = addObjectToRenderList(head, cam, &cube3);
-    head = addObjectToRenderList(head, cam, &cube4);
+    head = addObjectToRenderList(head, cam, &cube4);*/
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -182,9 +182,9 @@ int main( int argc, char* args[] ) {
     freeList(head);
 
     free_object(&cube1);
-    free_object(&cube2);
+    /*free_object(&cube2);
     free_object(&cube3);
-    free_object(&cube4);
+    free_object(&cube4);*/
     free_model(&cube);
 
     SDL_Quit();
