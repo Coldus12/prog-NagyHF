@@ -100,7 +100,7 @@ void renderTriangle(triangle tri, Camera cam, SDL_Renderer *SDL_renderer) {
 
     if (p1.posZ != -1 && p2.posZ != -1 && p3.posZ != -1) {
         filledTrigonRGBA(SDL_renderer, p1.posX, p1.posY, p2.posX, p2.posY, p3.posX, p3.posY, tri.r, tri.g, tri.b, 255);
-        //trigonRGBA(SDL_renderer, p1.posX, p1.posY, p2.posX, p2.posY, p3.posX, p3.posY, tri.r, tri.g, tri.b, 255);
+        trigonRGBA(SDL_renderer, p1.posX, p1.posY, p2.posX, p2.posY, p3.posX, p3.posY, 0, 0, 0, 255);
     }
 }
 
@@ -320,9 +320,75 @@ RList* bubble_sort_by_dist(RList *head) {
 RList* update_distances(RList* head, Camera cam) {
     RList *current = head;
     while (current != NULL) {
-        current->dist = dist_btw_Points(cam.location, centroid_of_triangle(*current->tri));
+        Point centroid = centroid_of_triangle(*current->tri);
+
+        current->dist = dist_btw_Points(cam.location, centroid);
+
+        /*if (!vcentroid_passes_through_any_tri(centroid, cam, head))
+            current->visible = true;
+        else
+            current->visible = false;*/
+
+        /*Point temp = centroid_of_triangle(*current->tri);
+        printf("Centroid: x: %.0lf, y: %.0lf, z: %.0lf ", temp.posX, temp.posY, temp.posZ);
+        printf("Distance: %.0lf ",current->dist);
+
+        if (current->tri->r == 255) {
+            printf("Red |");
+        } else if (current->tri->g == 255) {
+            printf("Green |");
+        } else if (current->tri->b == 255) {
+            printf("Blue |");
+        }*/
+
         current = current->next;
     }
+    /*printf("\n-----------------------------------------------------------------------------------------------\n");
+    printf("Cam location: %.0lf %.0lf %.0lf", cam.location.posX, cam.location.posY, cam.location.posZ);
+    printf("\n-----------------------------------------------------------------------------------------------\n");*/
+    return head;
+}
+
+/*! Eznnek a függvénynek a gondolatmenetét a
+ * https://stackoverflow.com/a/9755252/4589636
+ * oldalról, phuclv nevű felhasználótól vettem
+ * mert a saját logikán alapuló próbálkozásaim
+ * sikertelennek bizonyltak.
+ * */
+bool is_point_inside_trigon(Camera cam, Point p, triangle tri) {
+    Point a = interRenderPoint(cam, tri.p1);
+    Point b = interRenderPoint(cam, tri.p2);
+    Point c = interRenderPoint(cam, tri.p3);
+
+
+    double as_x = p.posX-a.posX;
+    double as_y = p.posY-a.posY;
+
+    bool s_ab = (b.posX-a.posX)*as_y-(b.posY-a.posY)*as_x > 0;
+
+    if((c.posX-a.posX)*as_y-(c.posY-a.posY)*as_x > 0 == s_ab) return false;
+
+    if((c.posX-b.posX)*(p.posY-b.posY)-(c.posY-b.posY)*(p.posX-b.posX) > 0 != s_ab) return false;
+
+    return true;
+}
+
+RList* change_stuff(RList* head, Camera cam) {
+    int size = 0;
+    RList *current = head;
+    while (current != NULL) {
+        size++;
+        current = current->next;
+    }
+
+    for (int i = size-1; i > 0; --i) {
+        for (int j = 0; j < i; ++j) {
+            if (is_point_inside_trigon(cam, centroid_of_triangle(*getListItem(head, i)->tri), *getListItem(head, j)->tri)) {
+                head = swap(head, i, j);
+            }
+        }
+    }
+
     return head;
 }
 
@@ -341,6 +407,7 @@ RList* update_distances(RList* head, Camera cam) {
 RList* render_RList(RList *head, Camera cam, SDL_Renderer *SDL_Renderer) {
     head = update_distances(head, cam);
     head = bubble_sort_by_dist(head);
+    //head = change_stuff(head, cam);
     RList *current = head;
 
     while (current != NULL) {

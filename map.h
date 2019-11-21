@@ -4,6 +4,8 @@
 
 #ifndef NAGYHF_MAP_H
 #define NAGYHF_MAP_H
+
+#include "object.h"
 typedef struct object_list{Object obj; struct object_list *next} object_list;
 typedef struct model_list{Model model; char name[50]; struct model_list *next} model_list;
 

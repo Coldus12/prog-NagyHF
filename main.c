@@ -13,6 +13,11 @@
 #include "debugmalloc-impl.h"
 #include "debugmalloc.h"
 
+/*TODO
+ * Hárosmzögek normálvektorát bevezetni, ha a(z) elforgatott normál vektor "átmegy"/"áthalad"/"döfi"
+ * a képernyő síkját, akkor a háromszöget ki kell rajzolni, egyéb esetben nem.
+ * */
+
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 960;
 
@@ -43,7 +48,7 @@ int main( int argc, char* args[] ) {
     cam.location.posX = 330;
     cam.location.posY = 100;
     cam.location.posZ = 200;
-    cam.distanceFromPlane = 500;
+    cam.distanceFromPlane = 700;
     cam.planeSizeX = SCREEN_WIDTH;
     cam.planeSizeY = SCREEN_HEIGHT;
     cam.viewDistance = 1000;
