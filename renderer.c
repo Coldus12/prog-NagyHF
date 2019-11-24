@@ -7,7 +7,7 @@
 #include <SDL_render.h>
 #include <SDL2_gfxPrimitives.h>
 
-#include "object.h"
+#include "map.h"
 
 //Debugmalloc:
 #include "debugmalloc-impl.h"
@@ -149,6 +149,17 @@ RList* addtoRenderList(RList *head, triangle *tri, double dist, bool visible) {
 RList* addObjectToRenderList(RList *head, Camera cam, Object *obj) {
     for (int i = 0; i < obj->model.triangleArray.size; i++) {
         head = addtoRenderList(head, &obj->model.triangleArray.triangles[i], dist_btw_Points(cam.location, centroid_of_triangle(obj->model.triangleArray.triangles[i])), true);
+    }
+    return head;
+}
+
+RList* addMapToRenderList(RList *head, Camera cam, map *map1) {
+    map *current = map1;
+    printf("0");
+    while(current != NULL) {
+        printf("1");
+        head = addObjectToRenderList(head, cam, &current->obj);
+        current = current->next;
     }
     return head;
 }
@@ -321,31 +332,9 @@ RList* update_distances(RList* head, Camera cam) {
     RList *current = head;
     while (current != NULL) {
         Point centroid = centroid_of_triangle(*current->tri);
-
         current->dist = dist_btw_Points(cam.location, centroid);
-
-        /*if (!vcentroid_passes_through_any_tri(centroid, cam, head))
-            current->visible = true;
-        else
-            current->visible = false;*/
-
-        /*Point temp = centroid_of_triangle(*current->tri);
-        printf("Centroid: x: %.0lf, y: %.0lf, z: %.0lf ", temp.posX, temp.posY, temp.posZ);
-        printf("Distance: %.0lf ",current->dist);
-
-        if (current->tri->r == 255) {
-            printf("Red |");
-        } else if (current->tri->g == 255) {
-            printf("Green |");
-        } else if (current->tri->b == 255) {
-            printf("Blue |");
-        }*/
-
         current = current->next;
     }
-    /*printf("\n-----------------------------------------------------------------------------------------------\n");
-    printf("Cam location: %.0lf %.0lf %.0lf", cam.location.posX, cam.location.posY, cam.location.posZ);
-    printf("\n-----------------------------------------------------------------------------------------------\n");*/
     return head;
 }
 

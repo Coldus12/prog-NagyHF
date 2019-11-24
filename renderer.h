@@ -8,7 +8,7 @@
 #include <SDL_render.h>
 #include <SDL2_gfxPrimitives.h>
 
-#include "object.h"
+#include "map.h"
 
 //Debugmalloc:
 #include "debugmalloc-impl.h"
@@ -25,6 +25,7 @@ void renderObject(Object object, Camera cam, SDL_Renderer *SDL_renderer);
 typedef struct RenderList{triangle *tri; double dist; struct RenderList *next} RList;
 RList* addtoRenderList(RList *head, triangle *tri, double dist, bool visible);
 RList* addObjectToRenderList(RList *head, Camera cam, Object *obj);
+RList* addMapToRenderList(RList *head, Camera cam, map *map1);
 void freeList(RList *head);
 RList* update_distances(RList* head, Camera cam);
 RList* render_RList(RList *head, Camera cam, SDL_Renderer *SDL_Renderer);

@@ -246,6 +246,16 @@ void move_Object_to_Point(Object *obj, Point point) {
     obj->location = point;
 }
 
+void pont_eltolasa_masik_ponttol(Point center, Point *tolando, int meret) {
+    Point deltaP;
+}
+
+void resize_Object(Object *obj, int newSize) {
+
+    for (int i = 0; i < obj->model.triangleArray.size; i++) {
+
+    }
+}
 
 void free_object(Object *obj) {
     free(obj->model.triangleArray.triangles);

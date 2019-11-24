@@ -13,11 +13,6 @@
 #include "debugmalloc-impl.h"
 #include "debugmalloc.h"
 
-/*TODO
- * Hárosmzögek normálvektorát bevezetni, ha a(z) elforgatott normál vektor "átmegy"/"áthalad"/"döfi"
- * a képernyő síkját, akkor a háromszöget ki kell rajzolni, egyéb esetben nem.
- * */
-
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 960;
 
@@ -40,6 +35,12 @@ int main( int argc, char* args[] ) {
         }
     }
 
+    //                                          Map és társai
+    //------------------------------------------------------------------------------------------------------------------
+    model_list *mod_list;
+    map *mapy = NULL;
+    mod_list = load_model_list("/home/coldus/Desktop/models.txt");
+    mapy = load_map_from_file("/home/coldus/Desktop/map.txt", mapy, *mod_list);
 
     //                                          Camera inicializálása
     //------------------------------------------------------------------------------------------------------------------
@@ -47,7 +48,7 @@ int main( int argc, char* args[] ) {
 
     cam.location.posX = 330;
     cam.location.posY = 100;
-    cam.location.posZ = 200;
+    cam.location.posZ = 000;
     cam.distanceFromPlane = 700;
     cam.planeSizeX = SCREEN_WIDTH;
     cam.planeSizeY = SCREEN_HEIGHT;
@@ -56,7 +57,7 @@ int main( int argc, char* args[] ) {
     //                                          Objektumok és Modelek
     //------------------------------------------------------------------------------------------------------------------
     Model cube;
-    load_model_from_file("cube.txt", &cube);
+    load_model_from_file("/home/coldus/Desktop/fa2.txt", &cube);
     //Point point;
 
     Object cube1, cube2, cube3, cube4;
@@ -101,12 +102,22 @@ int main( int argc, char* args[] ) {
     //                                                  RenderList
     //------------------------------------------------------------------------------------------------------------------
     RList *head = NULL;
+
+    map *current = mapy;
+    while(current != NULL) {
+        printf("1");
+        current = current->next;
+    }
+
     head = addObjectToRenderList(head, cam, &cube1);
+    //head = addMapToRenderList(head,cam,mapy);
     /*head = addObjectToRenderList(head, cam, &cube2);
     head = addObjectToRenderList(head, cam, &cube3);
     head = addObjectToRenderList(head, cam, &cube4);*/
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+    double rot = 0;
 
     for(bool keep_running = true; keep_running;) {
         for(SDL_Event ev; SDL_PollEvent(&ev);) {
@@ -155,6 +166,11 @@ int main( int argc, char* args[] ) {
             }
         }
 
+        /*if (rot < 360)
+            rot += 0.0001;
+        else
+            rot = 0;*/
+
         //Kamera mozgatása a térben
         cam.location.posX += x;
         cam.location.posY += y;
@@ -162,6 +178,8 @@ int main( int argc, char* args[] ) {
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
+
+        //rotate_Object_around_Point(cube1.location,&cube1, 0, rot*degree, 0);
 
         //Kamera forgatása
         cam.rotX = a*10*degree;
@@ -183,6 +201,9 @@ int main( int argc, char* args[] ) {
     }
 
     SDL_DestroyWindow(window);
+
+    free_model_list(mod_list);
+    free_object_list(mapy);
 
     freeList(head);
 

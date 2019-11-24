@@ -32,18 +32,16 @@ stdbool.h
 debugmalloc-impl.h
 /home/coldus/CLionProjects/nagyHF/debugmalloc-impl.h
 
-/home/coldus/CLionProjects/nagyHF/object.c
-stdbool.h
--
+/home/coldus/CLionProjects/nagyHF/map.c
 stdlib.h
--
-stdbool.h
 -
 stdio.h
 -
-string.h
--
-math.h
+object.h
+/home/coldus/CLionProjects/nagyHF/object.h
+
+/home/coldus/CLionProjects/nagyHF/object.h
+stdbool.h
 -
 debugmalloc-impl.h
 /home/coldus/CLionProjects/nagyHF/debugmalloc-impl.h
