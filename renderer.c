@@ -155,9 +155,7 @@ RList* addObjectToRenderList(RList *head, Camera cam, Object *obj) {
 
 RList* addMapToRenderList(RList *head, Camera cam, map *map1) {
     map *current = map1;
-    printf("0");
     while(current != NULL) {
-        printf("1");
         head = addObjectToRenderList(head, cam, &current->obj);
         current = current->next;
     }

@@ -39,8 +39,10 @@ int main( int argc, char* args[] ) {
     //------------------------------------------------------------------------------------------------------------------
     model_list *mod_list;
     map *mapy = NULL;
-    mod_list = load_model_list("/home/coldus/Desktop/models.txt");
-    mapy = load_map_from_file("/home/coldus/Desktop/map.txt", mapy, *mod_list);
+    //mod_list = load_model_list("/home/coldus/Desktop/models.txt");
+    //mapy = load_map_from_file("/home/coldus/Desktop/map.txt", mapy, *mod_list);
+    mod_list = load_model_list("models.txt");
+    mapy = load_map_from_file("map.txt", mapy, *mod_list);
 
     //                                          Camera inicializálása
     //------------------------------------------------------------------------------------------------------------------
@@ -56,14 +58,14 @@ int main( int argc, char* args[] ) {
 
     //                                          Objektumok és Modelek
     //------------------------------------------------------------------------------------------------------------------
-    Model cube;
+    /*Model cube;
     load_model_from_file("/home/coldus/Desktop/fa2.txt", &cube);
     //Point point;
 
     Object cube1, cube2, cube3, cube4;
     cube1.location.posX = 300;
     cube1.location.posY = 100;
-    cube1.location.posZ = 300;
+    cube1.location.posZ = 300;*/
 
     /*cube2.location.posX = 300;
     cube2.location.posY = 100;
@@ -77,7 +79,7 @@ int main( int argc, char* args[] ) {
     cube4.location.posY = 100;
     cube4.location.posZ = 300;*/
 
-    load_Model_into_Object(&cube1, cube);
+    //load_Model_into_Object(&cube1, cube);
     /*load_Model_into_Object(&cube2, cube);
     load_Model_into_Object(&cube3, cube);
     load_Model_into_Object(&cube4, cube);*/
@@ -94,7 +96,7 @@ int main( int argc, char* args[] ) {
     cam.rotY = 0*degree;
     cam.rotZ = 0*degree;
 
-    move_Object_to_Point(&cube1,point);
+    //move_Object_to_Point(&cube1,point);
     /*move_Object_to_Point(&cube2, p2);
     move_Object_to_Point(&cube3, p3);
     move_Object_to_Point(&cube4, p4);*/
@@ -104,13 +106,13 @@ int main( int argc, char* args[] ) {
     RList *head = NULL;
 
     map *current = mapy;
-    while(current != NULL) {
-        printf("1");
+    while (current != NULL) {
+        printf("location: x: %.0lf y: %.0lf z: %.0lf\n",current->obj.location.posX,current->obj.location.posY, current->obj.location.posZ);
         current = current->next;
     }
 
-    head = addObjectToRenderList(head, cam, &cube1);
-    //head = addMapToRenderList(head,cam,mapy);
+    //head = addObjectToRenderList(head, cam, &cube1);
+    head = addMapToRenderList(head,cam,mapy);
     /*head = addObjectToRenderList(head, cam, &cube2);
     head = addObjectToRenderList(head, cam, &cube3);
     head = addObjectToRenderList(head, cam, &cube4);*/
@@ -207,11 +209,11 @@ int main( int argc, char* args[] ) {
 
     freeList(head);
 
-    free_object(&cube1);
+    //free_object(&cube1);
     /*free_object(&cube2);
     free_object(&cube3);
     free_object(&cube4);*/
-    free_model(&cube);
+    //free_model(&cube);
 
     SDL_Quit();
 
