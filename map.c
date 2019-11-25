@@ -117,7 +117,7 @@ map* load_map_from_file(char *filename, map *map, model_list modelList) {
             obj.location.posY = (double) strtol(posY, NULL, 10);
             obj.location.posZ = (double) strtol(posZ, NULL, 10);
 
-            load_Model_into_Object(&obj, load_from_list(&modelList, name));
+            load_Model_into_Object(&obj, load_from_list(&modelList, name), strtod(size, NULL));
 
             rotate_Object_around_Point(obj.location, &obj, strtod(rotX, NULL), strtod(rotY,NULL), strtod(rotZ, NULL));
 

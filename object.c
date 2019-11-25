@@ -196,7 +196,7 @@ void load_model_from_file(char *filename, Model *mod) {
  *
  * FONTOS, hogy még mielőtt ezt a függvényt használnák inicializáljuk az Objektum koordinátáit.
  * */
-void load_Model_into_Object(Object *obj, Model model) {
+void load_Model_into_Object(Object *obj, Model model, double size) {
     Model newModel;
     init_triangle_array(&newModel.triangleArray, model.triangleArray.size);
 
@@ -206,6 +206,18 @@ void load_Model_into_Object(Object *obj, Model model) {
     obj->model = newModel;
 
     for (int i = 0; i < obj->model.triangleArray.size; i++) {
+        obj->model.triangleArray.triangles[i].p1.posX *= size;
+        obj->model.triangleArray.triangles[i].p1.posY *= size;
+        obj->model.triangleArray.triangles[i].p1.posZ *= size;
+
+        obj->model.triangleArray.triangles[i].p2.posX *= size;
+        obj->model.triangleArray.triangles[i].p2.posY *= size;
+        obj->model.triangleArray.triangles[i].p2.posZ *= size;
+
+        obj->model.triangleArray.triangles[i].p3.posX *= size;
+        obj->model.triangleArray.triangles[i].p3.posY *= size;
+        obj->model.triangleArray.triangles[i].p3.posZ *= size;
+
         obj->model.triangleArray.triangles[i].p1.posX += (obj->location.posX);
         obj->model.triangleArray.triangles[i].p1.posY += (obj->location.posY);
         obj->model.triangleArray.triangles[i].p1.posZ += (obj->location.posZ);

@@ -38,7 +38,7 @@ void load_model_from_file(char* filename, Model *mod);
 
 typedef struct Object{Model model; Point location; double angle_from_x_axis; double angle_from_y_axis; double angle_from_z_axis} Object;
 void move_Object_to_Point(Object *obj, Point point);
-void load_Model_into_Object(Object *obj, Model model);
+void load_Model_into_Object(Object *obj, Model model, double size);
 void free_object(Object *obj);
 
 //----------------------------------------------------------------
