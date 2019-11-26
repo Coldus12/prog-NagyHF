@@ -13,6 +13,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "../cmake/sdl2/FindSDL2.cmake"
   "../cmake/sdl2/FindSDL2_gfx.cmake"
   "../cmake/sdl2/FindSDL2_image.cmake"
+  "../cmake/sdl2/FindSDL2_ttf.cmake"
   "/var/lib/snapd/snap/clion/88/bin/cmake/linux/share/cmake-3.15/Modules/CMakeCInformation.cmake"
   "/var/lib/snapd/snap/clion/88/bin/cmake/linux/share/cmake-3.15/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake"
   "/var/lib/snapd/snap/clion/88/bin/cmake/linux/share/cmake-3.15/Modules/CMakeCommonLanguageInclude.cmake"

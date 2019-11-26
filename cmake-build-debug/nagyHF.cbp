@@ -84,6 +84,12 @@
 		<Unit filename="/home/coldus/CLionProjects/nagyHF/debugmalloc.h">
 			<Option target="nagyHF"/>
 		</Unit>
+		<Unit filename="/home/coldus/CLionProjects/nagyHF/game.c">
+			<Option target="nagyHF"/>
+		</Unit>
+		<Unit filename="/home/coldus/CLionProjects/nagyHF/game.h">
+			<Option target="nagyHF"/>
+		</Unit>
 		<Unit filename="/home/coldus/CLionProjects/nagyHF/main.c">
 			<Option target="nagyHF"/>
 		</Unit>
@@ -91,6 +97,12 @@
 			<Option target="nagyHF"/>
 		</Unit>
 		<Unit filename="/home/coldus/CLionProjects/nagyHF/map.h">
+			<Option target="nagyHF"/>
+		</Unit>
+		<Unit filename="/home/coldus/CLionProjects/nagyHF/menu.c">
+			<Option target="nagyHF"/>
+		</Unit>
+		<Unit filename="/home/coldus/CLionProjects/nagyHF/menu.h">
 			<Option target="nagyHF"/>
 		</Unit>
 		<Unit filename="/home/coldus/CLionProjects/nagyHF/object.c">
@@ -115,6 +127,9 @@
 			<Option virtualFolder="CMake Files\cmake\sdl2\"/>
 		</Unit>
 		<Unit filename="/home/coldus/CLionProjects/nagyHF/cmake/sdl2/FindSDL2_image.cmake">
+			<Option virtualFolder="CMake Files\cmake\sdl2\"/>
+		</Unit>
+		<Unit filename="/home/coldus/CLionProjects/nagyHF/cmake/sdl2/FindSDL2_ttf.cmake">
 			<Option virtualFolder="CMake Files\cmake\sdl2\"/>
 		</Unit>
 	</Project>

@@ -22,6 +22,8 @@ typedef struct din_point_array{Point* points; int size} din_point_array;
 typedef struct din_triangle_array{triangle* triangles; int size} triangle_array;
 typedef struct Model{triangle_array triangleArray} Model;
 typedef struct Object{Model model; Point location; double angle_from_x_axis; double angle_from_y_axis; double angle_from_z_axis} Object;
+//typedef struct plane{Point normal_vector; Point point; triangle projection1; triangle projection2; int color; int r; int g; int b} plane;
+typedef struct plane{Point location, normal_vector, p1, p2, p3, p4} plane;
 
 //                                      din_point_array
 //----------------------------------------------------------------------------------------------------------------------

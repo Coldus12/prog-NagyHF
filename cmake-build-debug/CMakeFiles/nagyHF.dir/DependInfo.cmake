@@ -4,8 +4,10 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
+  "/home/coldus/CLionProjects/nagyHF/game.c" "/home/coldus/CLionProjects/nagyHF/cmake-build-debug/CMakeFiles/nagyHF.dir/game.c.o"
   "/home/coldus/CLionProjects/nagyHF/main.c" "/home/coldus/CLionProjects/nagyHF/cmake-build-debug/CMakeFiles/nagyHF.dir/main.c.o"
   "/home/coldus/CLionProjects/nagyHF/map.c" "/home/coldus/CLionProjects/nagyHF/cmake-build-debug/CMakeFiles/nagyHF.dir/map.c.o"
+  "/home/coldus/CLionProjects/nagyHF/menu.c" "/home/coldus/CLionProjects/nagyHF/cmake-build-debug/CMakeFiles/nagyHF.dir/menu.c.o"
   "/home/coldus/CLionProjects/nagyHF/object.c" "/home/coldus/CLionProjects/nagyHF/cmake-build-debug/CMakeFiles/nagyHF.dir/object.c.o"
   "/home/coldus/CLionProjects/nagyHF/renderer.c" "/home/coldus/CLionProjects/nagyHF/cmake-build-debug/CMakeFiles/nagyHF.dir/renderer.c.o"
   )

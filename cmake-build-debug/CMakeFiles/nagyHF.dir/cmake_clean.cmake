@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/nagyHF.dir/game.c.o"
   "CMakeFiles/nagyHF.dir/main.c.o"
   "CMakeFiles/nagyHF.dir/map.c.o"
+  "CMakeFiles/nagyHF.dir/menu.c.o"
   "CMakeFiles/nagyHF.dir/object.c.o"
   "CMakeFiles/nagyHF.dir/renderer.c.o"
   "nagyHF"

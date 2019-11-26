@@ -123,6 +123,33 @@ nagyHF/fast:
 	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/build
 .PHONY : nagyHF/fast
 
+game.o: game.c.o
+
+.PHONY : game.o
+
+# target to build an object file
+game.c.o:
+	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/game.c.o
+.PHONY : game.c.o
+
+game.i: game.c.i
+
+.PHONY : game.i
+
+# target to preprocess a source file
+game.c.i:
+	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/game.c.i
+.PHONY : game.c.i
+
+game.s: game.c.s
+
+.PHONY : game.s
+
+# target to generate assembly for a file
+game.c.s:
+	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/game.c.s
+.PHONY : game.c.s
+
 main.o: main.c.o
 
 .PHONY : main.o
@@ -176,6 +203,33 @@ map.s: map.c.s
 map.c.s:
 	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/map.c.s
 .PHONY : map.c.s
+
+menu.o: menu.c.o
+
+.PHONY : menu.o
+
+# target to build an object file
+menu.c.o:
+	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/menu.c.o
+.PHONY : menu.c.o
+
+menu.i: menu.c.i
+
+.PHONY : menu.i
+
+# target to preprocess a source file
+menu.c.i:
+	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/menu.c.i
+.PHONY : menu.c.i
+
+menu.s: menu.c.s
+
+.PHONY : menu.s
+
+# target to generate assembly for a file
+menu.c.s:
+	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/menu.c.s
+.PHONY : menu.c.s
 
 object.o: object.c.o
 
@@ -240,12 +294,18 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... nagyHF"
 	@echo "... edit_cache"
+	@echo "... game.o"
+	@echo "... game.i"
+	@echo "... game.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
 	@echo "... map.o"
 	@echo "... map.i"
 	@echo "... map.s"
+	@echo "... menu.o"
+	@echo "... menu.i"
+	@echo "... menu.s"
 	@echo "... object.o"
 	@echo "... object.i"
 	@echo "... object.s"

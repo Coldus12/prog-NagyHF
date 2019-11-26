@@ -3,7 +3,7 @@ project(nagyHF C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(nagyHF debugmalloc.h debugmalloc-impl.h main.c object.c object.h renderer.c renderer.h map.c map.h)
+add_executable(nagyHF debugmalloc.h debugmalloc-impl.h main.c object.c object.h renderer.c renderer.h map.c map.h menu.c game.c game.h menu.h)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
 
@@ -21,5 +21,9 @@ target_link_libraries(${PROJECT_NAME} ${SDL2_IMAGE_LIBRARIES})
 find_package(SDL2_gfx REQUIRED)
 target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_GFX_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${SDL2_GFX_LIBRARIES})
+
+find_package(SDL2_ttf REQUIRED)
+target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_TTF_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} ${SDL2_TTF_LIBRARIES})
 
 target_link_libraries(${PROJECT_NAME} m)
