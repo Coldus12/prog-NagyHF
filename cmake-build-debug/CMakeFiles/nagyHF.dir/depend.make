@@ -56,12 +56,8 @@ CMakeFiles/nagyHF.dir/game.c.o: /usr/include/SDL2/close_code.h
 
 CMakeFiles/nagyHF.dir/main.c.o: ../debugmalloc-impl.h
 CMakeFiles/nagyHF.dir/main.c.o: ../debugmalloc.h
-CMakeFiles/nagyHF.dir/main.c.o: ../game.h
 CMakeFiles/nagyHF.dir/main.c.o: ../main.c
-CMakeFiles/nagyHF.dir/main.c.o: ../map.h
 CMakeFiles/nagyHF.dir/main.c.o: ../menu.h
-CMakeFiles/nagyHF.dir/main.c.o: ../object.h
-CMakeFiles/nagyHF.dir/main.c.o: ../renderer.h
 CMakeFiles/nagyHF.dir/main.c.o: /usr/include/SDL2/SDL.h
 CMakeFiles/nagyHF.dir/main.c.o: /usr/include/SDL2/SDL2_gfxPrimitives.h
 CMakeFiles/nagyHF.dir/main.c.o: /usr/include/SDL2/SDL_assert.h
@@ -114,7 +110,13 @@ CMakeFiles/nagyHF.dir/map.c.o: ../debugmalloc.h
 CMakeFiles/nagyHF.dir/map.c.o: ../map.c
 CMakeFiles/nagyHF.dir/map.c.o: ../object.h
 
+CMakeFiles/nagyHF.dir/menu.c.o: ../debugmalloc-impl.h
+CMakeFiles/nagyHF.dir/menu.c.o: ../debugmalloc.h
+CMakeFiles/nagyHF.dir/menu.c.o: ../game.h
+CMakeFiles/nagyHF.dir/menu.c.o: ../map.h
 CMakeFiles/nagyHF.dir/menu.c.o: ../menu.c
+CMakeFiles/nagyHF.dir/menu.c.o: ../object.h
+CMakeFiles/nagyHF.dir/menu.c.o: ../renderer.h
 CMakeFiles/nagyHF.dir/menu.c.o: /usr/include/SDL2/SDL.h
 CMakeFiles/nagyHF.dir/menu.c.o: /usr/include/SDL2/SDL2_gfxPrimitives.h
 CMakeFiles/nagyHF.dir/menu.c.o: /usr/include/SDL2/SDL_assert.h

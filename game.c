@@ -124,6 +124,9 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
                     case SDLK_e:
                         c--;
                         break;
+                    case SDLK_ESCAPE:
+                        keep_running = false;
+                        break;
                 }
             }
         }
