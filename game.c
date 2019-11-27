@@ -28,8 +28,8 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
     map *mapy = NULL;
     //mod_list = load_model_list("/home/coldus/Desktop/models.txt");
     //mapy = load_map_from_file("/home/coldus/Desktop/map.txt", mapy, *mod_list);
-    mod_list = load_model_list("models.txt");
-    mapy = load_map_from_file("map.txt", mapy, *mod_list);
+    mod_list = load_model_list("models2.txt");
+    mapy = load_map_from_file("map2.txt", mapy, *mod_list);
 
     //                                          Camera inicializálása
     //------------------------------------------------------------------------------------------------------------------
@@ -41,12 +41,13 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
     cam.distanceFromPlane = 700;
     cam.planeSizeX = SCREEN_WIDTH;
     cam.planeSizeY = SCREEN_HEIGHT;
-    cam.viewDistance = 1000;
-
+    //cam.viewDistance = 1000;
+    //Így nincs renderDistance gyakorlatilag
+    cam.viewDistance = -1;
     //                                          Objektumok és Modelek
     //------------------------------------------------------------------------------------------------------------------
     /*Model cube;
-    load_model_from_file("/home/coldus/Desktop/hegy.txt", &cube);
+    load_model_from_file("/home/coldus/Desktop/hegy2.txt", &cube);
     //Point point;
 
     Object cube1, cube2, cube3, cube4;
@@ -165,6 +166,9 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
 
         usleep(secsPerFrame*1000000);
     }
+
+    //free_model(&cube);
+    //free_object(&cube1);
 
     SDL_DestroyWindow(window);
 

@@ -8,10 +8,10 @@
 #include "debugmalloc-impl.h"
 #include "debugmalloc.h"
 
-const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 960;
-
 int main( int argc, char* args[] ) {
+    int SCREEN_WIDTH = 1280;
+    int SCREEN_HEIGHT = 960;
+
     //                                           SDL ablak létrehozása
     //------------------------------------------------------------------------------------------------------------------
     SDL_Window* window = NULL;
@@ -32,7 +32,7 @@ int main( int argc, char* args[] ) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    init_menu(window, renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+    init_main_menu(window, renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     SDL_Quit();
 

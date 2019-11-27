@@ -18,6 +18,140 @@
 #include "debugmalloc-impl.h"
 #include "debugmalloc.h"
 
+typedef struct MenuProperties{SDL_Window *window; SDL_Renderer *renderer; int SCREEN_WIDTH; int SCREEN_HEIGHT} MenuProperties;
+typedef struct int_list{int integer; struct int_list *next} int_list;
+typedef struct lines{char line[100]}lines;
+
+int_list* add_to_list(int_list* head, int new) {
+    int_list *newItem = malloc(sizeof(int_list));
+
+    newItem->integer = new;
+    newItem->next = NULL;
+
+    if (head==NULL)
+        return newItem;
+    int_list *iter = head;
+    while (iter->next !=NULL) {
+        iter = iter->next;
+    }
+    iter->next = newItem;
+    return head;
+}
+
+void free_int_list(int_list *head) {
+    int_list *iter = head;
+    while (iter != NULL) {
+        int_list* temp = iter->next;
+        free(iter);
+        iter = temp;
+    }
+
+}
+
+void print_list(int_list* head) {
+    int_list* iter = head;
+    while(iter != NULL) {
+        printf("%d ", iter->integer);
+        iter = iter->next;
+    }
+    printf("\n");
+}
+
+int_list* remove_last_item(int_list* head) {
+    int_list *prev = NULL;
+    int_list *iter = head;
+
+    while(iter->next->next != NULL) {
+        iter = iter->next;
+    }
+
+    free(iter->next);
+    iter->next = NULL;
+    return head;
+}
+
+int merge_int_list(int_list* head) {
+    char egybe[100] = {0};
+    int_list* iter = head;
+    while (iter != NULL) {
+        char new[10];
+        sprintf(new, "%d", iter->integer);
+        strcat(egybe, new);
+        iter = iter->next;
+    }
+
+    return (int) strtol(egybe, NULL, 10);
+}
+
+void load_resolutions(int *width, int *height) {
+    FILE *fp = fopen("beallitasok.txt","r");
+    fclose(fp);
+
+    char lines[8][100];
+    char line[100];
+    int i = 0;
+
+    //A beallitasok fajl csak 8 soros, szoval elvileg, hacsak nem irtak bele kezzel olyan dolgokat
+    //amiknek nem ott van a helyuk, akkor a 10 sor-nak elegnek kellene lennie.
+    while(fgets(line,sizeof(line), fp) != NULL) {
+        strcpy(lines[i],line);
+        //printf("%s\n", line);
+        //strcpy(lines[i], line);
+        i++;
+    }
+
+    for (int e = 0; e < 8; e++) {
+        if (strstr(lines[e], "Width") != NULL) {
+            //char temp[40];
+
+            //width = strtol()
+        } else if (strstr(lines[e], "Height") != NULL) {
+
+        }
+    }
+}
+
+void save_new_resolution(int new_width, int new_height) {
+    FILE *fp = fopen("beallitasok.txt","r");
+    FILE *temp = fopen("beallitasok.tmp","w");
+
+    //lines original_lines[10];
+    char lines[8][100];
+    char line[100];
+    int i = 0;
+
+    //A beallitasok fajl csak 8 soros, szoval elvileg, hacsak nem irtak bele kezzel olyan dolgokat
+    //amiknek nem ott van a helyuk, akkor a 10 sor-nak elegnek kellene lennie.
+    while(fgets(line,sizeof(line), fp) != NULL) {
+        strcpy(lines[i],line);
+        //printf("%s\n", line);
+        //strcpy(lines[i], line);
+        i++;
+    }
+
+    for (int e = 0; e < 8; e++) {
+        if (strstr(lines[e], "Width") != NULL) {
+            char new_line[100];
+            sprintf(new_line, "Width=%d\n",new_width);
+            strcpy(lines[e], new_line);
+        } else if (strstr(lines[e], "Height") != NULL) {
+            char new_line[100];
+            sprintf(new_line, "Height=%d\n",new_height);
+            strcpy(lines[e], new_line);
+        }
+        printf("%s\n",lines[e]);
+        fprintf(temp, "%s", lines[e]);
+    }
+
+    fclose(temp);
+    fclose(fp);
+
+    remove("beallitasok.txt");
+    rename("beallitasok.tmp", "beallitasok.txt");
+    int a, b;
+    //load_resolutions(&a,&b);
+}
+
 void drawString(char *string, int x, int y, int red, int green, int blue, int fontSize, SDL_Renderer *renderer) {
     TTF_Init();
     TTF_Font *font = TTF_OpenFont("/home/coldus/Desktop/Roboto-Regular.ttf", fontSize);
@@ -37,7 +171,9 @@ void drawString(char *string, int x, int y, int red, int green, int blue, int fo
     SDL_DestroyTexture(text_t);
 }
 
-void drawMenu(SDL_Renderer *renderer, int width, int height, int sel) {
+void drawMenu(MenuProperties mp, int sel) {
+    SDL_GetWindowSize(mp.window, &mp.SCREEN_WIDTH, &mp.SCREEN_HEIGHT);
+
     enum {
         start,
         settings,
@@ -45,45 +181,45 @@ void drawMenu(SDL_Renderer *renderer, int width, int height, int sel) {
         exit_window
     };
 
-    SDL_RenderClear(renderer);
+    SDL_RenderClear(mp.renderer);
+    SDL_SetRenderDrawColor(mp.renderer, 0, 0,0, 255);
 
     switch(sel%4) {
         case start:
-            drawString("Start",width/2,height/2-110,0,255,0,70,renderer);
-            drawString("Settings",width/2,height/2-40,255,0,0,70,renderer);
-            drawString("Records",width/2,height/2+40,255,0,0,70,renderer);
-            drawString("Exit",width/2,height/2+110,255,0,0,70,renderer);
+            drawString("Start",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2-110,0,255,0,70,mp.renderer);
+            drawString("Settings",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2-40,255,0,0,70,mp.renderer);
+            drawString("Records",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2+40,255,0,0,70,mp.renderer);
+            drawString("Exit",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2+110,255,0,0,70,mp.renderer);
             break;
         case settings:
-            drawString("Start",width/2,height/2-110,255,0,0,70,renderer);
-            drawString("Settings",width/2,height/2-40,0,255,0,70,renderer);
-            drawString("Records",width/2,height/2+40,255,0,0,70,renderer);
-            drawString("Exit",width/2,height/2+110,255,0,0,70,renderer);
+            drawString("Start",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2-110,255,0,0,70,mp.renderer);
+            drawString("Settings",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2-40,0,255,0,70,mp.renderer);
+            drawString("Records",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2+40,255,0,0,70,mp.renderer);
+            drawString("Exit",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2+110,255,0,0,70,mp.renderer);
             break;
         case records:
-            drawString("Start",width/2,height/2-110,255,0,0,70,renderer);
-            drawString("Settings",width/2,height/2-40,255,0,0,70,renderer);
-            drawString("Records",width/2,height/2+40,0,255,0,70,renderer);
-            drawString("Exit",width/2,height/2+110,255,0,0,70,renderer);
+            drawString("Start",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2-110,255,0,0,70,mp.renderer);
+            drawString("Settings",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2-40,255,0,0,70,mp.renderer);
+            drawString("Records",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2+40,0,255,0,70,mp.renderer);
+            drawString("Exit",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2+110,255,0,0,70,mp.renderer);
             break;
         case exit_window:
-            drawString("Start",width/2,height/2-110,255,0,0,70,renderer);
-            drawString("Settings",width/2,height/2-40,255,0,0,70,renderer);
-            drawString("Records",width/2,height/2+40,255,0,0,70,renderer);
-            drawString("Exit",width/2,height/2+110,0,255,0,70,renderer);
+            drawString("Start",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2-110,255,0,0,70,mp.renderer);
+            drawString("Settings",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2-40,255,0,0,70,mp.renderer);
+            drawString("Records",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2+40,255,0,0,70,mp.renderer);
+            drawString("Exit",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2+110,0,255,0,70,mp.renderer);
             break;
         default:
 
             break;
     }
-
-    //stringRGBA(renderer, 500, 500, "Nah", 255, 0, 0, 255);
-    //SDL_RenderClear(renderer);
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(mp.renderer);
 
 }
 
-void draw_settings_menu(SDL_Renderer *renderer, int width, int height, int sel) {
+void draw_settings_menu(MenuProperties mp, int sel) {
+    SDL_GetWindowSize(mp.window, &mp.SCREEN_WIDTH, &mp.SCREEN_HEIGHT);
+
     enum {
         display_settings,
         controls,
@@ -91,93 +227,275 @@ void draw_settings_menu(SDL_Renderer *renderer, int width, int height, int sel) 
     };
 
 
-    SDL_RenderClear(renderer);
+    SDL_RenderClear(mp.renderer);
+    SDL_SetRenderDrawColor(mp.renderer, 0, 0,0, 255);
 
     switch(sel%3) {
         case display_settings:
-            drawString("Display",width/2,height/2-110,0,255,0,70,renderer);
-            drawString("Controls",width/2,height/2-40,255,0,0,70,renderer);
-            drawString("Back",width/2,height/2+40,255,0,0,70,renderer);
+            drawString("Display",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2-110,0,255,0,70,mp.renderer);
+            drawString("Controls",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2-40,255,0,0,70,mp.renderer);
+            drawString("Back",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2+40,255,0,0,70,mp.renderer);
             break;
         case controls:
-            drawString("Display",width/2,height/2-110,255,0,0,70,renderer);
-            drawString("Controls",width/2,height/2-40,0,255,0,70,renderer);
-            drawString("Back",width/2,height/2+40,255,0,0,70,renderer);
+            drawString("Display",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2-110,255,0,0,70,mp.renderer);
+            drawString("Controls",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2-40,0,255,0,70,mp.renderer);
+            drawString("Back",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2+40,255,0,0,70,mp.renderer);
             break;
         case back:
-            drawString("Display",width/2,height/2-110,255,0,0,70,renderer);
-            drawString("Controls",width/2,height/2-40,255,0,0,70,renderer);
-            drawString("Back",width/2,height/2+40,0,255,0,70,renderer);
+            drawString("Display",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2-110,255,0,0,70,mp.renderer);
+            drawString("Controls",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2-40,255,0,0,70,mp.renderer);
+            drawString("Back",mp.SCREEN_WIDTH/2,mp.SCREEN_HEIGHT/2+40,0,255,0,70,mp.renderer);
             break;
         default:
 
             break;
     }
-
-    //stringRGBA(renderer, 500, 500, "Nah", 255, 0, 0, 255);
-    //SDL_RenderClear(renderer);
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(mp.renderer);
 }
 
-void settings() {
+void draw_display_settings(MenuProperties mp, int sel) {
+    SDL_GetWindowSize(mp.window, &mp.SCREEN_WIDTH, &mp.SCREEN_HEIGHT);
 
-}
-
-void displaysettings(SDL_Renderer *renderer, int SCREEN_WIDTH, int SCREEN_HEIGHT, int sel) {
+    SDL_RenderClear(mp.renderer);
+    SDL_SetRenderDrawColor(mp.renderer,0,0,0,255);
     char width[50] = "Width: ";
     char height[50] = "Height: ";
     char w[32];
     char h[32];
 
-    sprintf(w, "%d", SCREEN_WIDTH);
-    sprintf(h, "%d", SCREEN_HEIGHT);
+    sprintf(w, "%d", mp.SCREEN_WIDTH);
+    sprintf(h, "%d", mp.SCREEN_HEIGHT);
     strcat(width, w);
     strcat(height, h);
 
-
-    SDL_RenderClear(renderer);
-    drawString("Jelenlegi felbontásod:",SCREEN_WIDTH/4, SCREEN_HEIGHT/4, 200, 200, 200, 25, renderer);
-    drawString(width, 20*SCREEN_WIDTH/64, 20*SCREEN_HEIGHT/64, 100, 100, 100, 18, renderer);
-    drawString(height, 20*SCREEN_WIDTH/64, 24*SCREEN_HEIGHT/64, 100, 100, 100, 18, renderer);
-    drawString("Szeretnél rajta változtatni??", SCREEN_WIDTH/4, SCREEN_HEIGHT/2, 200, 200, 200, 25, renderer);
+    drawString("Jelenlegi felbontásod:",mp.SCREEN_WIDTH/4, mp.SCREEN_HEIGHT/4, 200, 200, 200, 25, mp.renderer);
+    drawString(width, 20*mp.SCREEN_WIDTH/64, 20*mp.SCREEN_HEIGHT/64, 100, 100, 100, 18, mp.renderer);
+    drawString(height, 20*mp.SCREEN_WIDTH/64, 24*mp.SCREEN_HEIGHT/64, 100, 100, 100, 18, mp.renderer);
+    drawString("Szeretnél rajta változtatni??", mp.SCREEN_WIDTH/4, mp.SCREEN_HEIGHT/2, 200, 200, 200, 25, mp.renderer);
     if (sel%2 == 0) {
-        drawString("Igen",17*SCREEN_WIDTH/64, 18*SCREEN_HEIGHT/32, 100, 255, 100, 20, renderer);
-        drawString("Nem",24*SCREEN_WIDTH/64, 18*SCREEN_HEIGHT/32, 100, 100, 100, 20, renderer);
+        drawString("Igen",17*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 255, 100, 20, mp.renderer);
+        drawString("Nem",24*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
     } else {
-        drawString("Igen",17*SCREEN_WIDTH/64, 18*SCREEN_HEIGHT/32, 100, 100, 100, 20, renderer);
-        drawString("Nem",24*SCREEN_WIDTH/64, 18*SCREEN_HEIGHT/32, 100, 255, 100, 20, renderer);
+        drawString("Igen",17*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
+        drawString("Nem",24*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 255, 100, 20, mp.renderer);
     }
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(mp.renderer);
 }
 
-void draw_selected_menu(int menu_number, int sel, SDL_Renderer *renderer, int SCREEN_WIDTH, int SCREEN_HEIGHT) {
+void draw_edit(MenuProperties mp, int_list* head, bool width) {
+    SDL_GetWindowSize(mp.window, &mp.SCREEN_WIDTH, &mp.SCREEN_HEIGHT);
+
+    SDL_RenderClear(mp.renderer);
+    SDL_SetRenderDrawColor(mp.renderer, 0, 0, 0, 255);
+
+    char current[40];
+    if (width) {
+        drawString("Az új width legyen:", mp.SCREEN_WIDTH/3, mp.SCREEN_HEIGHT/3, 100, 100, 100, 20, mp.renderer);
+    } else {
+        drawString("Az új height legyen:", mp.SCREEN_WIDTH/3, mp.SCREEN_HEIGHT/3, 100, 100, 100, 20, mp.renderer);
+    }
+    sprintf(current, "%d", merge_int_list(head));
+    drawString(current, 3*mp.SCREEN_WIDTH/6, 3*mp.SCREEN_HEIGHT/6, 200, 200, 200, 30, mp.renderer);
+
+    SDL_RenderPresent(mp.renderer);
+}
+
+void edit_display_settings(MenuProperties mp) {
+    SDL_GetWindowSize(mp.window, &mp.SCREEN_WIDTH, &mp.SCREEN_HEIGHT);
+
+    SDL_Event event;
+    bool keep_running = true;
+    bool width = true;
+    int_list *head = NULL;
+    int new_width, new_height;
+
+    while(keep_running) {
+        draw_edit(mp, head, width);
+        while(SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                keep_running = false;
+            } else if (event.type == SDL_KEYDOWN) {
+                switch (event.key.keysym.sym) {
+
+                    case SDLK_0:
+                        head = add_to_list(head,0);
+                        print_list(head);
+                        draw_edit(mp, head, width);
+                        break;
+                    case SDLK_1:
+                        head = add_to_list(head,1);
+                        draw_edit(mp, head, width);
+                        break;
+                    case SDLK_2:
+                        head = add_to_list(head,2);
+                        draw_edit(mp, head, width);
+                        break;
+                    case SDLK_3:
+                        head = add_to_list(head,3);
+                        draw_edit(mp, head, width);
+                        break;
+                    case SDLK_4:
+                        head = add_to_list(head,4);
+                        draw_edit(mp, head, width);
+                        break;
+                    case SDLK_5:
+                        head = add_to_list(head,5);
+                        draw_edit(mp, head, width);
+                        break;
+                    case SDLK_6:
+                        head = add_to_list(head,6);
+                        draw_edit(mp, head, width);
+                        break;
+                    case SDLK_7:
+                        head = add_to_list(head,7);
+                        draw_edit(mp, head, width);
+                        break;
+                    case SDLK_8:
+                        head = add_to_list(head,8);
+                        draw_edit(mp, head, width);
+                        break;
+                    case SDLK_9:
+                        head = add_to_list(head,9);
+                        draw_edit(mp, head, width);
+                        break;
+                    case SDLK_RETURN:
+                        draw_edit(mp, head,width);
+                        int temp = merge_int_list(head);
+                        free_int_list(head);
+                        head = NULL;
+                        if (!width) {
+                            keep_running = false;
+                            new_height = temp;
+                            printf("%d\n", new_height);
+                        } else {
+                            width = false;
+                            new_width = temp;
+                            printf("%d\n", new_width);
+                        }
+                        break;
+                    case SDLK_BACKSPACE:
+                        head = remove_last_item(head);
+                        draw_edit(mp,head, width);
+                        break;
+                }
+            }
+        }
+    }
+
+    save_new_resolution(new_width, new_height);
+    SDL_SetWindowSize(mp.window, new_width, new_height);
+}
+
+void display_settings(MenuProperties mp, int sel) {
+    //SDL_GetWindowSize(mp.window, &mp.SCREEN_HEIGHT, &mp.SCREEN_WIDTH);
+
     enum {
-        main_menu,
-        settings_menu,
-        display_settings,
-        control_settings
+        display,
+        back
     };
 
-    switch (menu_number%4) {
-        case main_menu:
-            drawMenu(renderer, SCREEN_WIDTH, SCREEN_HEIGHT, sel);
-            break;
-        case settings_menu:
-            draw_settings_menu(renderer, SCREEN_WIDTH, SCREEN_HEIGHT, sel);
-            break;
-        case display_settings:
-            displaysettings(renderer, SCREEN_WIDTH, SCREEN_HEIGHT, sel);
-            break;
-        case control_settings:
-            break;
-        default:
-            printf("Something must've went wrong with the menu numbers...\n");
-            break;
-    }
+    SDL_Event event;
+    bool keep_running = true;
+    while (keep_running) {
+        draw_display_settings(mp, sel);
+        while(SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                keep_running = false;
+            } else if (event.type == SDL_KEYDOWN) {
+                switch (event.key.keysym.sym) {
 
+                    case SDLK_LEFT:
+                        if (sel == 1) {
+                            sel = 2;
+                        } else {
+                            sel--;
+                        }
+                        draw_display_settings(mp, sel);
+                        break;
+                    case SDLK_RIGHT:
+                        sel++;
+                        draw_display_settings(mp, sel);
+                        break;
+                    case SDLK_RETURN:
+                        switch (sel % 2) {
+                            case display:
+                                edit_display_settings(mp);
+                                break;
+                            case back:
+                                keep_running = false;
+                                break;
+                            default:
+                                sel = 1;
+                                break;
+                        }
+                        break;
+                    default:
+                        printf("itt\n");
+                        break;
+                }
+            }
+        }
+    }
 }
 
-void init_menu(SDL_Window *window, SDL_Renderer *renderer, int SCREEN_WIDTH, int SCREEN_HEIGHT) {
+void settings_menu(MenuProperties menuProperties, int sel) {
+    //SDL_GetWindowSize(menuProperties.window, &menuProperties.SCREEN_HEIGHT, &menuProperties.SCREEN_WIDTH);
+    enum {
+        display,
+        controls,
+        back
+    };
+
+    SDL_Event event;
+    bool keep_running = true;
+    while (keep_running) {
+        draw_settings_menu(menuProperties, sel);
+        while(SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                keep_running = false;
+            } else if (event.type == SDL_KEYDOWN) {
+                switch (event.key.keysym.sym) {
+
+                    case SDLK_UP:
+                        if (sel == 1) {
+                            sel = 3;
+                        } else {
+                            sel--;
+                        }
+                        draw_settings_menu(menuProperties, sel);
+                        break;
+                    case SDLK_DOWN:
+                        sel++;
+                        draw_settings_menu(menuProperties, sel);
+                        break;
+                    case SDLK_RETURN:
+                        switch (sel % 3) {
+                            case display:
+                                display_settings(menuProperties, sel);
+                                break;
+                            case controls:
+                                sel = 1;
+                                //settings_menu(mp, sel);
+                                break;
+                            case back:
+                                keep_running = false;
+                                break;
+                            default:
+                                sel = 3;
+                                break;
+                        }
+                        break;
+                    default:
+                        printf("ott\n");
+                        break;
+                }
+            }
+        }
+    }
+}
+
+void init_main_menu(SDL_Window *window, SDL_Renderer *renderer, int SCREEN_WIDTH, int SCREEN_HEIGHT) {
+    //SDL_GetWindowSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
     enum {
         start,
         settings,
@@ -185,149 +503,65 @@ void init_menu(SDL_Window *window, SDL_Renderer *renderer, int SCREEN_WIDTH, int
         exit_window
     };
 
-    enum {
-        display_settings,
-        controls,
-        back
-    };
-
-    enum{
-        mm,
-        sm,
-        ds,
-        cs
-    };
+    MenuProperties mp;
+    mp.renderer = renderer;
+    mp.window = window;
+    mp.SCREEN_HEIGHT = SCREEN_HEIGHT;
+    mp.SCREEN_WIDTH = SCREEN_WIDTH;
 
     int sel = 1;
     int currentmenu = 0;
     bool keep_running = true;
     SDL_Event event;
     while(keep_running) {
-        draw_selected_menu(currentmenu, sel, renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
-        //SDL_RenderClear(renderer);
-        //SDL_SetRenderDrawColor(renderer, 0, 0, 0,255);
+        drawMenu(mp, sel);
 
         while(SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 keep_running = false;
             } else if (event.type == SDL_KEYDOWN) {
-                switch (currentmenu) {
-                    case mm:
-                        switch (event.key.keysym.sym) {
+                switch (event.key.keysym.sym) {
 
-                            case SDLK_UP:
-                                if (sel == 1) {
-                                    sel = 4;
-                                } else {
-                                    sel--;
-                                }
-                                drawMenu(renderer, SCREEN_WIDTH, SCREEN_HEIGHT, sel);
+                    case SDLK_UP:
+                        if (sel == 1) {
+                            sel = 4;
+                        } else {
+                            sel--;
+                        }
+                        drawMenu(mp, sel);
+                        break;
+                    case SDLK_DOWN:
+                        sel++;
+                        drawMenu(mp, sel);
+                        break;
+                    case SDLK_RETURN:
+                        switch (sel % 4) {
+                            case start:
+                                startGame(renderer, window, SCREEN_WIDTH, SCREEN_HEIGHT);
+                                keep_running = false;
                                 break;
-                            case SDLK_DOWN:
-                                sel++;
-                                drawMenu(renderer, SCREEN_WIDTH, SCREEN_HEIGHT, sel);
+                            case settings:
+                                sel = 1;
+                                settings_menu(mp, sel);
                                 break;
-                            case SDLK_RETURN:
-                                switch (sel%4) {
-                                    case start:
-                                        startGame(renderer, window, SCREEN_WIDTH, SCREEN_HEIGHT);
-                                        keep_running = false;
-                                        break;
-                                    case settings:
-                                        //settings_menu(window, renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
-                                        sel = 1;
-                                        currentmenu = sm;
-                                        break;
-                                    case records:
-                                        break;
-                                    case exit_window:
-                                        keep_running = false;
-                                        break;
-                                    default:
-                                        sel = 4;
-                                        break;
-                                }
+                            case records:
+                                break;
+                            case exit_window:
+                                keep_running = false;
                                 break;
                             default:
-                                printf("%d", SDL_KEYDOWN);
-                                printf("whaaa\n");
-                                break;
-                        }
-                        break;
-                    case sm:
-                        switch (event.key.keysym.sym) {
-                            case SDLK_UP:
-                                if (sel == 1) {
-                                    sel = 3;
-                                } else {
-                                    sel--;
-                                }
-                                draw_settings_menu(renderer, SCREEN_WIDTH, SCREEN_HEIGHT, sel);
-                                break;
-                            case SDLK_DOWN:
-                                sel++;
-                                draw_settings_menu(renderer, SCREEN_WIDTH, SCREEN_HEIGHT, sel);
-                                break;
-                            case SDLK_RETURN:
-                                switch (sel%3) {
-                                    case display_settings:
-                                        sel = 1;
-                                        currentmenu = ds;
-                                        //displaysettings(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
-                                        //do stuff
-                                        break;
-                                    case controls:
-                                        //do stuff
-                                        break;
-                                    case back:
-                                        sel = 1;
-                                        currentmenu = mm;
-                                        break;
-                                }
-                                break;
-                        }
-                        break;
-                    case ds:
-                        switch(event.key.keysym.sym) {
-                            case SDLK_LEFT:
-                                if (sel == 1)
-                                    sel = 2;
-                                else
-                                    sel--;
-
-                                draw_selected_menu(currentmenu, sel, renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
-                                break;
-                            case SDLK_RIGHT:
-                                sel++;
-                                draw_selected_menu(currentmenu, sel, renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
-                                break;
-                            case SDLK_RETURN:
-                                if (sel%2 == 0) {
-                                    //do stuff
-                                } else {
-                                    sel = 1;
-                                    currentmenu = sm;
-                                }
-                                break;
-                        }
-                        break;
-                    case cs:
-                        switch(event.key.keysym.sym) {
-                            case SDLK_UP:
-                                break;
-                            case SDLK_DOWN:
-                                break;
-                            case SDLK_RETURN:
+                                sel = 4;
                                 break;
                         }
                         break;
                     default:
+                        printf("amott\n");
                         break;
                 }
             }
         }
-        //SDL_RenderPresent(renderer);
     }
 }
+
 
 #endif
