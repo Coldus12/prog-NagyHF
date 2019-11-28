@@ -20,7 +20,9 @@
 
 typedef struct MenuProperties{SDL_Window *window; SDL_Renderer *renderer; int SCREEN_WIDTH; int SCREEN_HEIGHT} MenuProperties;
 typedef struct int_list{int integer; struct int_list *next} int_list;
-typedef struct lines{char line[100]}lines;
+
+//                                              int_list
+//----------------------------------------------------------------------------------------------------------------------
 
 int_list* add_to_list(int_list* head, int new) {
     int_list *newItem = malloc(sizeof(int_list));
@@ -83,32 +85,57 @@ int merge_int_list(int_list* head) {
     return (int) strtol(egybe, NULL, 10);
 }
 
+//                                  Felbontás betöltése és mentése
+//----------------------------------------------------------------------------------------------------------------------
+
 void load_resolutions(int *width, int *height) {
     FILE *fp = fopen("beallitasok.txt","r");
-    fclose(fp);
 
     char lines[8][100];
     char line[100];
-    int i = 0;
 
-    //A beallitasok fajl csak 8 soros, szoval elvileg, hacsak nem irtak bele kezzel olyan dolgokat
-    //amiknek nem ott van a helyuk, akkor a 10 sor-nak elegnek kellene lennie.
+    int i = 0;
     while(fgets(line,sizeof(line), fp) != NULL) {
         strcpy(lines[i],line);
-        //printf("%s\n", line);
-        //strcpy(lines[i], line);
+        //MI?!?
+        //printf("%s",line);
+        //printf("%s",lines[i]);
         i++;
     }
 
     for (int e = 0; e < 8; e++) {
+        //printf("hey\n");
         if (strstr(lines[e], "Width") != NULL) {
-            //char temp[40];
+            char tmp[100];
+            int end = 2;
+            strncpy(tmp, lines[e]+7, sizeof(lines[e])-7);
+            for (int j = 0; j < (int) sizeof(tmp); j ++) {
+                //Az idézőjel ASCII kódja 34
+                if (tmp[i] == 34)
+                    end = i-1;
+            }
+            strncpy(tmp, tmp, end);
+            *width = (int) strtol(tmp, NULL, 10);
+            printf("Width = %d\n", *width);
 
-            //width = strtol()
         } else if (strstr(lines[e], "Height") != NULL) {
-
+            char tmp[100];
+            int end = 2;
+            strncpy(tmp, lines[e]+8, sizeof(lines[e])-8);
+            for (int j = 0; j < (int) sizeof(tmp); j ++) {
+                //Az idézőjel ASCII kódja 34
+                if (tmp[i] == 34)
+                    end = i-1;
+            }
+            strncpy(tmp, tmp,  end);
+            *height = (int) strtol(tmp, NULL, 10);
+            printf("Height = %d\n", *height);
+        } else {
+            //printf("%s",lines[e]);
         }
     }
+
+    fclose(fp);
 }
 
 void save_new_resolution(int new_width, int new_height) {
@@ -132,14 +159,13 @@ void save_new_resolution(int new_width, int new_height) {
     for (int e = 0; e < 8; e++) {
         if (strstr(lines[e], "Width") != NULL) {
             char new_line[100];
-            sprintf(new_line, "Width=%d\n",new_width);
+            sprintf(new_line, "Width=\"%d\"\n",new_width);
             strcpy(lines[e], new_line);
         } else if (strstr(lines[e], "Height") != NULL) {
             char new_line[100];
-            sprintf(new_line, "Height=%d\n",new_height);
+            sprintf(new_line, "Height=\"%d\"\n",new_height);
             strcpy(lines[e], new_line);
         }
-        printf("%s\n",lines[e]);
         fprintf(temp, "%s", lines[e]);
     }
 
@@ -151,6 +177,9 @@ void save_new_resolution(int new_width, int new_height) {
     int a, b;
     //load_resolutions(&a,&b);
 }
+
+//                                          Szöveg kiíró függvény
+//----------------------------------------------------------------------------------------------------------------------
 
 void drawString(char *string, int x, int y, int red, int green, int blue, int fontSize, SDL_Renderer *renderer) {
     TTF_Init();
@@ -170,6 +199,9 @@ void drawString(char *string, int x, int y, int red, int green, int blue, int fo
     SDL_FreeSurface(text);
     SDL_DestroyTexture(text_t);
 }
+
+//                                        Menüket kirajzoló függvények
+//----------------------------------------------------------------------------------------------------------------------
 
 void drawMenu(MenuProperties mp, int sel) {
     SDL_GetWindowSize(mp.window, &mp.SCREEN_WIDTH, &mp.SCREEN_HEIGHT);
@@ -256,6 +288,13 @@ void draw_settings_menu(MenuProperties mp, int sel) {
 void draw_display_settings(MenuProperties mp, int sel) {
     SDL_GetWindowSize(mp.window, &mp.SCREEN_WIDTH, &mp.SCREEN_HEIGHT);
 
+    enum {
+        display,
+        back,
+        fullscreen_yes,
+        fullscreen_no
+    };
+
     SDL_RenderClear(mp.renderer);
     SDL_SetRenderDrawColor(mp.renderer,0,0,0,255);
     char width[50] = "Width: ";
@@ -272,12 +311,39 @@ void draw_display_settings(MenuProperties mp, int sel) {
     drawString(width, 20*mp.SCREEN_WIDTH/64, 20*mp.SCREEN_HEIGHT/64, 100, 100, 100, 18, mp.renderer);
     drawString(height, 20*mp.SCREEN_WIDTH/64, 24*mp.SCREEN_HEIGHT/64, 100, 100, 100, 18, mp.renderer);
     drawString("Szeretnél rajta változtatni??", mp.SCREEN_WIDTH/4, mp.SCREEN_HEIGHT/2, 200, 200, 200, 25, mp.renderer);
-    if (sel%2 == 0) {
-        drawString("Igen",17*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 255, 100, 20, mp.renderer);
-        drawString("Nem",24*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
-    } else {
-        drawString("Igen",17*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
-        drawString("Nem",24*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 255, 100, 20, mp.renderer);
+    drawString("Legyen teljes képernyős?", mp.SCREEN_WIDTH/4, 20*mp.SCREEN_HEIGHT/32, 200, 200, 200, 25, mp.renderer);
+
+    switch(sel) {
+        case display:
+            drawString("Igen",17*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 255, 100, 20, mp.renderer);
+            drawString("Nem",24*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
+
+            drawString("Igen",17*mp.SCREEN_WIDTH/64, 22*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
+            drawString("Nem",24*mp.SCREEN_WIDTH/64, 22*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
+            break;
+        case back:
+            drawString("Igen",17*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
+            drawString("Nem",24*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 255, 100, 20, mp.renderer);
+
+            drawString("Igen",17*mp.SCREEN_WIDTH/64, 22*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
+            drawString("Nem",24*mp.SCREEN_WIDTH/64, 22*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
+            break;
+        case fullscreen_yes:
+            drawString("Igen",17*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
+            drawString("Nem",24*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
+
+            drawString("Igen",17*mp.SCREEN_WIDTH/64, 22*mp.SCREEN_HEIGHT/32, 100, 255, 100, 20, mp.renderer);
+            drawString("Nem",24*mp.SCREEN_WIDTH/64, 22*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
+            break;
+        case fullscreen_no:
+            drawString("Igen",17*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
+            drawString("Nem",24*mp.SCREEN_WIDTH/64, 18*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
+
+            drawString("Igen",17*mp.SCREEN_WIDTH/64, 22*mp.SCREEN_HEIGHT/32, 100, 100, 100, 20, mp.renderer);
+            drawString("Nem",24*mp.SCREEN_WIDTH/64, 22*mp.SCREEN_HEIGHT/32, 100, 255, 100, 20, mp.renderer);
+            break;
+        default:
+            break;
     }
     SDL_RenderPresent(mp.renderer);
 }
@@ -300,6 +366,9 @@ void draw_edit(MenuProperties mp, int_list* head, bool width) {
     SDL_RenderPresent(mp.renderer);
 }
 
+//                                    Felbontás megváltoztását kezelő függvény
+//----------------------------------------------------------------------------------------------------------------------
+
 void edit_display_settings(MenuProperties mp) {
     SDL_GetWindowSize(mp.window, &mp.SCREEN_WIDTH, &mp.SCREEN_HEIGHT);
 
@@ -319,7 +388,7 @@ void edit_display_settings(MenuProperties mp) {
 
                     case SDLK_0:
                         head = add_to_list(head,0);
-                        print_list(head);
+                        //print_list(head);
                         draw_edit(mp, head, width);
                         break;
                     case SDLK_1:
@@ -366,11 +435,11 @@ void edit_display_settings(MenuProperties mp) {
                         if (!width) {
                             keep_running = false;
                             new_height = temp;
-                            printf("%d\n", new_height);
+                            //printf("%d\n", new_height);
                         } else {
                             width = false;
                             new_width = temp;
-                            printf("%d\n", new_width);
+                            //printf("%d\n", new_width);
                         }
                         break;
                     case SDLK_BACKSPACE:
@@ -386,12 +455,39 @@ void edit_display_settings(MenuProperties mp) {
     SDL_SetWindowSize(mp.window, new_width, new_height);
 }
 
+void control_settings(MenuProperties mp, int sel) {
+    enum {
+        display,
+        controls,
+        back
+    };
+
+    SDL_Event event;
+    bool keep_running = true;
+    while (keep_running) {
+        while(SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                keep_running = false;
+            } else if (event.type == SDL_KEYDOWN) {
+                printf("%s\n",SDL_GetKeyName(event.key.keysym.sym));
+                switch (event.key.keysym.sym) {
+                    case SDLK_RETURN:
+                        keep_running = false;
+                        break;
+                }
+            }
+        }
+    }
+}
+
 void display_settings(MenuProperties mp, int sel) {
     //SDL_GetWindowSize(mp.window, &mp.SCREEN_HEIGHT, &mp.SCREEN_WIDTH);
 
     enum {
         display,
-        back
+        back,
+        fullscreen_yes,
+        fullscreen_no
     };
 
     SDL_Event event;
@@ -404,24 +500,63 @@ void display_settings(MenuProperties mp, int sel) {
             } else if (event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
 
+                    case SDLK_DOWN:
+                    case SDLK_UP:
+                        switch (sel % 4) {
+                            case display:
+                                sel = fullscreen_yes;
+                                break;
+                            case back:
+                                sel = fullscreen_no;
+                                break;
+                            case fullscreen_yes:
+                                sel = display;
+                                break;
+                            case fullscreen_no:
+                                sel = back;
+                                break;
+                            default:
+                                sel = 1;
+                                break;
+                        }
+                        draw_display_settings(mp,sel);
+                        break;
+
                     case SDLK_LEFT:
-                        if (sel == 1) {
-                            sel = 2;
-                        } else {
-                            sel--;
+                    case SDLK_RIGHT:
+                        switch (sel % 4) {
+                            case display:
+                                sel = back;
+                                break;
+                            case back:
+                                sel = display;
+                                break;
+                            case fullscreen_yes:
+                                sel = fullscreen_no;
+                                break;
+                            case fullscreen_no:
+                                sel = fullscreen_yes;
+                                break;
+                            default:
+                                sel = 1;
+                                break;
                         }
                         draw_display_settings(mp, sel);
                         break;
-                    case SDLK_RIGHT:
-                        sel++;
-                        draw_display_settings(mp, sel);
-                        break;
+
                     case SDLK_RETURN:
-                        switch (sel % 2) {
+                        switch (sel % 4) {
                             case display:
                                 edit_display_settings(mp);
                                 break;
                             case back:
+                                keep_running = false;
+                                break;
+                            case fullscreen_yes:
+                                SDL_SetWindowFullscreen(mp.window, true);
+                                break;
+                            case fullscreen_no:
+                                SDL_SetWindowFullscreen(mp.window, false);
                                 keep_running = false;
                                 break;
                             default:
@@ -430,7 +565,6 @@ void display_settings(MenuProperties mp, int sel) {
                         }
                         break;
                     default:
-                        printf("itt\n");
                         break;
                 }
             }
@@ -474,7 +608,8 @@ void settings_menu(MenuProperties menuProperties, int sel) {
                                 display_settings(menuProperties, sel);
                                 break;
                             case controls:
-                                sel = 1;
+                                //sel = 1;
+                                control_settings(menuProperties, sel);
                                 //settings_menu(mp, sel);
                                 break;
                             case back:
@@ -486,7 +621,6 @@ void settings_menu(MenuProperties menuProperties, int sel) {
                         }
                         break;
                     default:
-                        printf("ott\n");
                         break;
                 }
             }
@@ -537,7 +671,9 @@ void init_main_menu(SDL_Window *window, SDL_Renderer *renderer, int SCREEN_WIDTH
                     case SDLK_RETURN:
                         switch (sel % 4) {
                             case start:
-                                startGame(renderer, window, SCREEN_WIDTH, SCREEN_HEIGHT);
+                                SCREEN_HEIGHT = mp.SCREEN_HEIGHT;
+                                SCREEN_WIDTH = mp.SCREEN_WIDTH;
+                                startGame(renderer, window, SCREEN_WIDTH, SCREEN_HEIGHT, "models2.txt", "map2.txt");
                                 keep_running = false;
                                 break;
                             case settings:
@@ -555,7 +691,6 @@ void init_main_menu(SDL_Window *window, SDL_Renderer *renderer, int SCREEN_WIDTH
                         }
                         break;
                     default:
-                        printf("amott\n");
                         break;
                 }
             }

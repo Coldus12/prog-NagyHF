@@ -1,6 +1,6 @@
 [Display] 
-Width=1280
-Height=720
+Width="1280"
+Height="720"
 [Controls]
 moveForward="SDLK_w"
 moveBackward="SDLK_s"

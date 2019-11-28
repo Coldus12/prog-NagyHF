@@ -111,6 +111,12 @@
 		<Unit filename="/home/coldus/CLionProjects/nagyHF/object.h">
 			<Option target="nagyHF"/>
 		</Unit>
+		<Unit filename="/home/coldus/CLionProjects/nagyHF/player.c">
+			<Option target="nagyHF"/>
+		</Unit>
+		<Unit filename="/home/coldus/CLionProjects/nagyHF/player.h">
+			<Option target="nagyHF"/>
+		</Unit>
 		<Unit filename="/home/coldus/CLionProjects/nagyHF/renderer.c">
 			<Option target="nagyHF"/>
 		</Unit>

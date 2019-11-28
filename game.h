@@ -18,6 +18,6 @@
 #include "debugmalloc-impl.h"
 #include "debugmalloc.h"
 
-void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int SCREEN_HEIGHT);
+void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int SCREEN_HEIGHT, char* path_to_mod_ist, char* path_to_map);
 
 #endif //NAGYHF_GAME_H

@@ -21,15 +21,18 @@
 #include "debugmalloc-impl.h"
 #include "debugmalloc.h"
 
-void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int SCREEN_HEIGHT) {
+void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int SCREEN_HEIGHT, char* path_to_mod_ist, char* path_to_map) {
     //                                          Map és társai
     //------------------------------------------------------------------------------------------------------------------
     model_list *mod_list;
     map *mapy = NULL;
+    Point location = {300,100,300};
+    invis_wall* belso = load_invis_wall_from_file("korpalya_belso_invis.txt", location, 10);
+    invis_wall* kulso = load_invis_wall_from_file("korpalya_kulso_invis.txt",location,30);
     //mod_list = load_model_list("/home/coldus/Desktop/models.txt");
     //mapy = load_map_from_file("/home/coldus/Desktop/map.txt", mapy, *mod_list);
-    mod_list = load_model_list("models2.txt");
-    mapy = load_map_from_file("map2.txt", mapy, *mod_list);
+    mod_list = load_model_list(path_to_mod_ist);
+    mapy = load_map_from_file(path_to_map, mapy, *mod_list);
 
     //                                          Camera inicializálása
     //------------------------------------------------------------------------------------------------------------------
@@ -37,7 +40,7 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
 
     cam.location.posX = 330;
     cam.location.posY = 100;
-    cam.location.posZ = 000;
+    cam.location.posZ = 80;
     cam.distanceFromPlane = 700;
     cam.planeSizeX = SCREEN_WIDTH;
     cam.planeSizeY = SCREEN_HEIGHT;
@@ -138,9 +141,17 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
             rot = 0;*/
 
         //Kamera mozgatása a térben
-        cam.location.posX += x;
-        cam.location.posY += y;
-        cam.location.posZ += z;
+        if (point_inside_invis_walls(belso, cam.location) || point_outside_invis_walls(kulso,cam.location)) {
+            cam.location.posX -= x;
+            cam.location.posY -= y;
+            cam.location.posZ -= z;
+            //printf("bünn!!\n");
+        } else {
+            cam.location.posX += x;
+            cam.location.posY += y;
+            cam.location.posZ += z;
+            //printf("benn\n");
+        }
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
@@ -167,11 +178,14 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
         usleep(secsPerFrame*1000000);
     }
 
+    print_invis(belso);
     //free_model(&cube);
     //free_object(&cube1);
 
     SDL_DestroyWindow(window);
 
+    free_invis_wall(belso);
+    free_invis_wall(kulso);
     free_model_list(mod_list);
     free_object_list(mapy);
 

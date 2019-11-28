@@ -258,6 +258,33 @@ object.c.s:
 	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/object.c.s
 .PHONY : object.c.s
 
+player.o: player.c.o
+
+.PHONY : player.o
+
+# target to build an object file
+player.c.o:
+	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/player.c.o
+.PHONY : player.c.o
+
+player.i: player.c.i
+
+.PHONY : player.i
+
+# target to preprocess a source file
+player.c.i:
+	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/player.c.i
+.PHONY : player.c.i
+
+player.s: player.c.s
+
+.PHONY : player.s
+
+# target to generate assembly for a file
+player.c.s:
+	$(MAKE) -f CMakeFiles/nagyHF.dir/build.make CMakeFiles/nagyHF.dir/player.c.s
+.PHONY : player.c.s
+
 renderer.o: renderer.c.o
 
 .PHONY : renderer.o
@@ -309,6 +336,9 @@ help:
 	@echo "... object.o"
 	@echo "... object.i"
 	@echo "... object.s"
+	@echo "... player.o"
+	@echo "... player.i"
+	@echo "... player.s"
 	@echo "... renderer.o"
 	@echo "... renderer.i"
 	@echo "... renderer.s"

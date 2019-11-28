@@ -410,14 +410,4 @@ RList* render_RList(RList *head, Camera cam, SDL_Renderer *SDL_Renderer) {
     return head;
 }
 
-//                                          plane
-//----------------------------------------------------------------------------------------------------------------------
-void update_plane(plane *p1, Camera cam) {
-
-}
-
-RList* addPlaneToRenderList() {
-
-}
-
 #endif

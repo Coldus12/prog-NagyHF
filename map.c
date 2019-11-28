@@ -8,8 +8,197 @@
 #include <stdio.h>
 #include "object.h"
 
+//Debugmalloc:
+#include "debugmalloc-impl.h"
+#include "debugmalloc.h"
+
 typedef struct object_list{Object obj; struct object_list *next} map;
 typedef struct model_list{Model model; char name[50]; struct model_list *next} model_list;
+typedef struct invis_wall{Point location; Point p; struct invis_wall* next; double size} invis_wall;
+
+//        Függvény, ami eldönti, hogy egy pont jobbra vagy balra van két másik pontoz képest (Jobb körüljárással)
+//----------------------------------------------------------------------------------------------------------------------
+bool is_it_left(Point first, Point second, Point pointInQuestion) {
+    if (first.posX != second.posX) {
+        double m = ((double) second.posZ - first.posZ) / (double) (second.posX - first.posX);
+        //y-y1 = m(x-x1)
+        //mx1-y1=mx-y
+        //x,y eldontendo x és y-ja
+        //x1,y1 elso pont x és y-ja
+        double konstans = m * first.posX - first.posZ;
+        if (first.posX < second.posX) {
+            if(konstans > (m * pointInQuestion.posX - pointInQuestion.posZ)) {
+                return false;
+            /*} else if (konstans == (m * pointInQuestion.posX - pointInQuestion.posZ)) {
+                //printf("benne van shit\n");
+                return true;*/
+            } else {
+                return true;
+            }
+        } else {
+            if(konstans < (m * pointInQuestion.posX - pointInQuestion.posZ)) {
+                return false;
+            /*} else if (konstans == (m * pointInQuestion.posX - pointInQuestion.posZ)) {
+                //printf("benne van shit\n");
+                return true;*/
+            } else {
+                return true;
+            }
+        }
+    } else {
+        if (pointInQuestion.posX < first.posX)
+            return true;
+        else
+            return false;
+    }
+}
+
+//                                         invis_wall függvényei
+//----------------------------------------------------------------------------------------------------------------------
+invis_wall* add_point_to_inviswall(invis_wall* head, Point new_point, Point location, double size) {
+    invis_wall* new_item = malloc(sizeof(invis_wall));
+
+    new_point.posX *= size;
+    new_point.posY *= size;
+    new_point.posZ *= size;
+
+    new_point.posX += location.posX;
+    new_point.posY += location.posY;
+    new_point.posZ += location.posZ;
+
+    new_item->size = size;
+    new_item->p = new_point;
+    new_item->next = NULL;
+
+    if (head == NULL)
+        return new_item;
+
+    invis_wall* iter = head;
+    while (iter->next != NULL) {
+        iter = iter->next;
+    }
+    iter->next = new_item;
+    return head;
+}
+
+void free_invis_wall(invis_wall* head) {
+    invis_wall* iter = head;
+    while (iter != NULL) {
+        invis_wall* tmp = iter->next;
+        free(iter);
+        iter = tmp;
+    }
+}
+
+bool point_inside_invis_walls(invis_wall* head, Point p) {
+    invis_wall* iter = head;
+
+    while (iter != NULL) {
+        //printf("X: %.0lf Y: %.0lf Z: %.0lf",iter->p.posX,iter->p.posY, iter->p.posZ);
+        if (iter->next != NULL) {
+            if (!is_it_left(iter->p, iter->next->p, p))
+                return false;
+        } else {
+            if (!is_it_left(iter->p, head->p, p))
+                return false;
+        }
+        iter = iter->next;
+    }
+    return true;
+}
+
+bool point_outside_invis_walls(invis_wall* head, Point p) {
+    invis_wall* iter = head;
+    while (iter != NULL) {
+        if (iter->next != NULL) {
+            if (!is_it_left(iter->p, iter->next->p, p))
+                //printf("mé\n");
+                return true;
+        } else {
+            if (!is_it_left(iter->p, head->p, p))
+                return true;
+        }
+        iter = iter->next;
+    }
+    return false;
+}
+
+invis_wall* load_invis_wall_from_file(char* path, Point location, double size) {
+    invis_wall* head = NULL;
+    FILE *fp = fopen(path,"r");
+    if (fp == NULL) {
+        printf("Nem sikerült a fájl megnyitása");
+        return NULL;
+    }
+
+    char line[100];
+    while (fgets(line,sizeof(line), fp) != NULL) {
+        Point new_point;
+        char posx[20];
+        char posz[20];
+        sscanf(line, "%s %s", posx, posz);
+        //printf("%s %s\n",posx,posz);
+        new_point.posY = 0;
+        new_point.posX = strtod(posx,NULL);
+        new_point.posZ = strtod(posz,NULL);
+        //printf("%.0lf %.0lf\n", new_point.posX, new_point.posZ);
+
+        head = add_point_to_inviswall(head,new_point, location, size);
+    }
+
+    fclose(fp);
+    return head;
+}
+
+invis_wall* rotate_invis_wall(invis_wall* head, double rotX, double rotY, double rotZ) {
+    for (invis_wall* iter = head; iter != NULL; iter = iter->next) {
+        rotate_Point_around_Point(iter->location,&iter->p,rotX,rotY,rotZ);
+    }
+    return head;
+}
+
+invis_wall* move_invis_wall(invis_wall* head, Point new_location) {
+    for (invis_wall* iter = head; iter != NULL; iter = iter->next) {
+        double dx = new_location.posX-iter->location.posX;
+        double dy = new_location.posY-iter->location.posY;
+        double dz = new_location.posZ-iter->location.posZ;
+
+        iter->p.posX += dx;
+        iter->p.posY += dy;
+        iter->p.posZ += dz;
+
+        iter->location = new_location;
+    }
+    return head;
+}
+
+invis_wall* resize_invis_wall(invis_wall* head, double new_size) {
+    for (invis_wall* iter = head; iter != NULL; iter = iter->next) {
+        iter->p.posX -= iter->location.posX;
+        iter->p.posY -= iter->location.posY;
+        iter->p.posZ -= iter->location.posZ;
+
+        iter->p.posX *= (new_size/iter->size);
+        iter->p.posY *= (new_size/iter->size);
+        iter->p.posZ *= (new_size/iter->size);
+
+        iter->p.posX += iter->location.posX;
+        iter->p.posY += iter->location.posY;
+        iter->p.posZ += iter->location.posZ;
+
+        iter->size = new_size;
+    }
+    return head;
+}
+
+void print_invis(invis_wall* head) {
+    for (invis_wall* iter = head; iter != NULL; iter = iter->next) {
+        printf("%.0lf %.0lf\n",iter->p.posX, iter->p.posZ);
+    }
+}
+
+//                                             map függvényei
+//----------------------------------------------------------------------------------------------------------------------
 
 map* add_object_to_map(map *head, Object obj) {
     map *newItem = (map*) malloc(sizeof(map));
@@ -94,6 +283,7 @@ Model load_from_list(model_list *head, char *name) {
 
 }
 
+//                                     Map betöltésének függvénye
 //----------------------------------------------------------------------------------------------------------------------
 
 map* load_map_from_file(char *filename, map *map, model_list modelList) {
