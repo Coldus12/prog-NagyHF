@@ -299,7 +299,7 @@ map* load_map_from_file(char *filename, map *map, model_list modelList) {
 
     while(fgets(string, sizeof(string),fp) != NULL) {
         sscanf(string, "%s %s %s %s %s %s %s %s", name, posX, posY, posZ, size, rotX, rotY, rotZ);
-        printf("%s\n",string);
+        //printf("%s\n",string);
         if (does_model_list_contain(&modelList, name)) {
             //printf("positions: x: %s y: %s z: %s size: %s rotX: %s rotY: %s rotZ: %s\n", posX, posY, posZ, size, rotX, rotY, rotZ);
             Object obj;

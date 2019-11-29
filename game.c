@@ -20,17 +20,24 @@
 //Debugmalloc:
 #include "debugmalloc-impl.h"
 #include "debugmalloc.h"
+#include "menu.h"
 
 void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int SCREEN_HEIGHT, char* path_to_mod_ist, char* path_to_map) {
+
+    //                                          Iránítás betöltése
+    //------------------------------------------------------------------------------------------------------------------
+    Controls controls;
+    load_controls(&controls);
+
     //                                          Map és társai
     //------------------------------------------------------------------------------------------------------------------
     model_list *mod_list;
     map *mapy = NULL;
     Point location = {300,100,300};
+
     invis_wall* belso = load_invis_wall_from_file("korpalya_belso_invis.txt", location, 10);
     invis_wall* kulso = load_invis_wall_from_file("korpalya_kulso_invis.txt",location,30);
-    //mod_list = load_model_list("/home/coldus/Desktop/models.txt");
-    //mapy = load_map_from_file("/home/coldus/Desktop/map.txt", mapy, *mod_list);
+
     mod_list = load_model_list(path_to_mod_ist);
     mapy = load_map_from_file(path_to_map, mapy, *mod_list);
 
@@ -90,7 +97,19 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
             if(ev.type == SDL_QUIT) {
                 keep_running = false;
             } else if (ev.type == SDL_KEYDOWN) {
-                switch (ev.key.keysym.sym) {
+                int keycode = ev.key.keysym.sym;
+                if (keycode == SDLK_ESCAPE) {
+                    keep_running = false;
+                } else if (keycode == controls.forward) {
+                    z+=10;
+                } else if (keycode == controls.backward) {
+                    z-=10;
+                } else if (keycode == controls.left) {
+                    x-=10;
+                } else if (keycode == controls.right) {
+                    x+=10;
+                }
+                /*switch (ev.key.keysym.sym) {
                     case SDLK_UP:
                         //printf("shit");
                         z+=10;
@@ -131,7 +150,7 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
                     case SDLK_ESCAPE:
                         keep_running = false;
                         break;
-                }
+                }*/
             }
         }
 
@@ -178,7 +197,7 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
         usleep(secsPerFrame*1000000);
     }
 
-    print_invis(belso);
+    //print_invis(belso);
     //free_model(&cube);
     //free_object(&cube1);
 

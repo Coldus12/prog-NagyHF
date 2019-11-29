@@ -2,7 +2,7 @@
 Width="1280"
 Height="720"
 [Controls]
-moveForward="SDLK_w"
-moveBackward="SDLK_s"
-moveLeft="SDLK_a"
-moveRight="SDLK_d"
+moveForward="119"
+moveBackward="115"
+moveLeft="97"
+moveRight="100"

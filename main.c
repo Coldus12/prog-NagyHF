@@ -16,7 +16,7 @@ int main( int argc, char* args[] ) {
     load_resolutions(&SCREEN_WIDTH, &SCREEN_HEIGHT);
     Point kezodhelyzet = {0, 0, 0};
     Player player = initPlayer(kezodhelyzet,300,"fa.txt",SCREEN_WIDTH,SCREEN_HEIGHT, 0);
-    printf("player lofasz: %d\n",player.thirdPersonView.planeSizeY);
+    //printf("player lofasz: %d\n",player.thirdPersonView.planeSizeY);
     free_player(&player);
 
     //                                           SDL ablak létrehozása

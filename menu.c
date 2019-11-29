@@ -20,6 +20,7 @@
 
 typedef struct MenuProperties{SDL_Window *window; SDL_Renderer *renderer; int SCREEN_WIDTH; int SCREEN_HEIGHT} MenuProperties;
 typedef struct int_list{int integer; struct int_list *next} int_list;
+typedef struct controls{int forward; int backward; int left; int right} Controls;
 
 //                                              int_list
 //----------------------------------------------------------------------------------------------------------------------
@@ -111,8 +112,8 @@ void load_resolutions(int *width, int *height) {
             strncpy(tmp, lines[e]+7, sizeof(lines[e])-7);
             for (int j = 0; j < (int) sizeof(tmp); j ++) {
                 //Az idézőjel ASCII kódja 34
-                if (tmp[i] == 34)
-                    end = i-1;
+                if (tmp[j] == 34)
+                    end = j-1;
             }
             strncpy(tmp, tmp, end);
             *width = (int) strtol(tmp, NULL, 10);
@@ -124,8 +125,8 @@ void load_resolutions(int *width, int *height) {
             strncpy(tmp, lines[e]+8, sizeof(lines[e])-8);
             for (int j = 0; j < (int) sizeof(tmp); j ++) {
                 //Az idézőjel ASCII kódja 34
-                if (tmp[i] == 34)
-                    end = i-1;
+                if (tmp[j] == 34)
+                    end = j-1;
             }
             strncpy(tmp, tmp,  end);
             *height = (int) strtol(tmp, NULL, 10);
@@ -176,6 +177,109 @@ void save_new_resolution(int new_width, int new_height) {
     rename("beallitasok.tmp", "beallitasok.txt");
     int a, b;
     //load_resolutions(&a,&b);
+}
+
+//                                  Irányítás betöltése és mentése
+//----------------------------------------------------------------------------------------------------------------------
+
+void save_controls(Controls controls) {
+    FILE *fp = fopen("beallitasok.txt","r");
+    FILE *temp = fopen("beallitasok.tmp","w");
+
+    //lines original_lines[10];
+    char lines[8][100];
+    char line[100];
+    int i = 0;
+
+    //A beallitasok fajl csak 8 soros, szoval elvileg, hacsak nem irtak bele kezzel olyan dolgokat
+    //amiknek nem ott van a helyuk, akkor a 10 sor-nak elegnek kellene lennie.
+    while(fgets(line,sizeof(line), fp) != NULL) {
+        strcpy(lines[i],line);
+        i++;
+    }
+
+    for (int e = 0; e < 8; e++) {
+        if (strstr(lines[e], "moveForward") != NULL) {
+            char new_line[100];
+            sprintf(new_line, "moveForward=\"%d\"\n",controls.forward);
+            strcpy(lines[e], new_line);
+        } else if (strstr(lines[e], "moveBackward") != NULL) {
+            char new_line[100];
+            sprintf(new_line, "moveBackward=\"%d\"\n",controls.backward);
+            strcpy(lines[e], new_line);
+        } else if (strstr(lines[e], "moveLeft") != NULL) {
+            char new_line[100];
+            sprintf(new_line, "moveLeft=\"%d\"\n",controls.left);
+            strcpy(lines[e], new_line);
+        } else if (strstr(lines[e], "moveRight") != NULL) {
+            char new_line[100];
+            sprintf(new_line, "moveRight=\"%d\"\n",controls.right);
+            strcpy(lines[e], new_line);
+        }
+        fprintf(temp, "%s", lines[e]);
+    }
+
+    fclose(temp);
+    fclose(fp);
+
+    remove("beallitasok.txt");
+    rename("beallitasok.tmp", "beallitasok.txt");
+}
+
+void load_controls(Controls* controls) {
+    FILE *fp = fopen("beallitasok.txt", "r");
+    char line[100];
+    while(fgets(line, sizeof(line),fp) != NULL) {
+        char tmp[100];
+        if (strstr(line, "moveForward")) {
+            strncpy(tmp, line+13, sizeof(line)-13);
+            int end = 2;
+            for (int i = 0; i < (int) sizeof(tmp); i ++) {
+                //Az idézőjel ASCII kódja 34
+                if (tmp[i] == 34)
+                    end = i-1;
+            }
+            strncpy(tmp,tmp,end);
+            controls->forward = (int) strtol(tmp,NULL,10);
+            //strcat(forward,SDL_GetKeyName(keycode));
+        } else if (strstr(line, "moveBackward")) {
+            strncpy(tmp, line+14, sizeof(line)-14);
+            int end = 2;
+            for (int i = 0; i < (int) sizeof(tmp); i ++) {
+                //Az idézőjel ASCII kódja 34
+                if (tmp[i] == 34)
+                    end = i-1;
+            }
+            strncpy(tmp,tmp,end);
+            controls->backward = (int) strtol(tmp,NULL,10);
+            //strcat(backward,SDL_GetKeyName(keycode));
+        } else if (strstr(line, "moveLeft")) {
+            strncpy(tmp, line+10, sizeof(line)-10);
+            int end = 2;
+            for (int i = 0; i < (int) sizeof(tmp); i ++) {
+                //Az idézőjel ASCII kódja 34
+                if (tmp[i] == 34)
+                    end = i-1;
+            }
+            strncpy(tmp,tmp,end);
+            controls->left = (int) strtol(tmp,NULL,10);
+            //strcat(left,SDL_GetKeyName(keycode));
+        } else if (strstr(line, "moveRight")) {
+            strncpy(tmp, line+11, sizeof(line)-11);
+            int end = 2;
+            for (int i = 0; i < (int) sizeof(tmp); i ++) {
+                //Az idézőjel ASCII kódja 34
+                if (tmp[i] == 34)
+                    end = i-1;
+            }
+            strncpy(tmp,tmp,end);
+            controls->right = (int) strtol(tmp,NULL,10);
+            //strcat(right,SDL_GetKeyName(keycode));
+        }
+    }
+
+    //printf("%s %s %s %s\n", forward, backward, left, right);
+    fclose(fp);
 }
 
 //                                          Szöveg kiíró függvény
@@ -366,7 +470,78 @@ void draw_edit(MenuProperties mp, int_list* head, bool width) {
     SDL_RenderPresent(mp.renderer);
 }
 
-//                                    Felbontás megváltoztását kezelő függvény
+void draw_control_settings(MenuProperties mp, int sel, Controls controls, bool setup) {
+    enum {
+        forward_s,
+        backward_s,
+        left_s,
+        right_s,
+        back
+    };
+
+    SDL_RenderClear(mp.renderer);
+    SDL_SetRenderDrawColor(mp.renderer,0,0,0,255);
+
+    char forward[100] = "Előre: ";
+    char backward[100] = "Hátra: ";
+    char left[100] = "Balra: ";
+    char right[100] = "Jobbra: ";
+
+    strcat(forward,SDL_GetKeyName(controls.forward));
+    strcat(backward,SDL_GetKeyName(controls.backward));
+    strcat(left,SDL_GetKeyName(controls.left));
+    strcat(right,SDL_GetKeyName(controls.right));
+
+    if (!setup) {
+        drawString("Jelenlegi beállításaid:",mp.SCREEN_WIDTH/4, mp.SCREEN_HEIGHT/4, 200, 200, 200, 25, mp.renderer);
+        drawString(forward, 20*mp.SCREEN_WIDTH/64, 20*mp.SCREEN_HEIGHT/64, 100, 100, 100, 18, mp.renderer);
+        drawString(backward, 20*mp.SCREEN_WIDTH/64, 24*mp.SCREEN_HEIGHT/64, 100, 100, 100, 18, mp.renderer);
+        drawString(left, 20*mp.SCREEN_WIDTH/64, 28*mp.SCREEN_HEIGHT/64, 100, 100, 100, 18, mp.renderer);
+        drawString(right, 20*mp.SCREEN_WIDTH/64, 32*mp.SCREEN_HEIGHT/64, 100, 100, 100, 18, mp.renderer);
+        drawString("Szeretnél rajtuk változtatni?", mp.SCREEN_WIDTH/4, 36*mp.SCREEN_HEIGHT/64, 200, 200, 200, 25, mp.renderer);
+
+        switch (sel%2) {
+            case 0:
+                drawString("Igen",17*mp.SCREEN_WIDTH/64, 40*mp.SCREEN_HEIGHT/64, 100, 100, 100, 20, mp.renderer);
+                drawString("Nem",24*mp.SCREEN_WIDTH/64, 40*mp.SCREEN_HEIGHT/64, 100, 255, 100, 20, mp.renderer);
+                break;
+            case 1:
+                drawString("Igen",17*mp.SCREEN_WIDTH/64, 40*mp.SCREEN_HEIGHT/64, 100, 255, 100, 20, mp.renderer);
+                drawString("Nem",24*mp.SCREEN_WIDTH/64, 40*mp.SCREEN_HEIGHT/64, 100, 100, 100, 20, mp.renderer);
+                break;
+        }
+    } else {
+        drawString("Jelenlegi beállításaid:",mp.SCREEN_WIDTH/4, mp.SCREEN_HEIGHT/4, 200, 200, 200, 25, mp.renderer);
+        drawString(forward, 20*mp.SCREEN_WIDTH/64, 20*mp.SCREEN_HEIGHT/64, 100, 100, 100, 18, mp.renderer);
+        drawString(backward, 20*mp.SCREEN_WIDTH/64, 24*mp.SCREEN_HEIGHT/64, 100, 100, 100, 18, mp.renderer);
+        drawString(left, 20*mp.SCREEN_WIDTH/64, 28*mp.SCREEN_HEIGHT/64, 100, 100, 100, 18, mp.renderer);
+        drawString(right, 20*mp.SCREEN_WIDTH/64, 32*mp.SCREEN_HEIGHT/64, 100, 100, 100, 18, mp.renderer);
+        drawString("Vissza", mp.SCREEN_WIDTH/4, 36*mp.SCREEN_HEIGHT/64, 100, 100, 100, 25, mp.renderer);
+        switch (sel%5) {
+            case forward_s:
+                drawString(forward, 20*mp.SCREEN_WIDTH/64, 20*mp.SCREEN_HEIGHT/64, 200, 200, 200, 18, mp.renderer);
+                break;
+            case backward_s:
+                drawString(backward, 20*mp.SCREEN_WIDTH/64, 24*mp.SCREEN_HEIGHT/64, 200, 200, 200, 18, mp.renderer);
+                break;
+            case left_s:
+                drawString(left, 20*mp.SCREEN_WIDTH/64, 28*mp.SCREEN_HEIGHT/64, 200, 200, 200, 18, mp.renderer);
+                break;
+            case right_s:
+                drawString(right, 20*mp.SCREEN_WIDTH/64, 32*mp.SCREEN_HEIGHT/64, 200, 200, 200, 18, mp.renderer);
+                break;
+            case back:
+                drawString("Vissza", mp.SCREEN_WIDTH/4, 36*mp.SCREEN_HEIGHT/64, 200, 200, 200, 25, mp.renderer);
+                break;
+        }
+    }
+
+    SDL_RenderPresent(mp.renderer);
+}
+
+
+
+//                                  Felbontás megváltoztását kezelő függvény
 //----------------------------------------------------------------------------------------------------------------------
 
 void edit_display_settings(MenuProperties mp) {
@@ -455,30 +630,110 @@ void edit_display_settings(MenuProperties mp) {
     SDL_SetWindowSize(mp.window, new_width, new_height);
 }
 
+//                               Az irányítást meegváltoztató menü függvénye
+//----------------------------------------------------------------------------------------------------------------------
+
 void control_settings(MenuProperties mp, int sel) {
     enum {
-        display,
-        controls,
-        back
+        back,
+        edit_controls
     };
+
+    enum {
+        forward_s,
+        backward_s,
+        left_s,
+        right_s,
+        back_s
+    };
+    Controls controls;
+    load_controls(&controls);
+    bool setup = false;
 
     SDL_Event event;
     bool keep_running = true;
+
     while (keep_running) {
+        draw_control_settings(mp, sel, controls, setup);
         while(SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 keep_running = false;
             } else if (event.type == SDL_KEYDOWN) {
-                printf("%s\n",SDL_GetKeyName(event.key.keysym.sym));
-                switch (event.key.keysym.sym) {
-                    case SDLK_RETURN:
-                        keep_running = false;
-                        break;
+                //printf("%d ",event.key.keysym.sym);
+                if (!setup) {
+                    switch (event.key.keysym.sym) {
+                        case SDLK_LEFT:
+                            if (sel == back)
+                                sel = edit_controls;
+                            else
+                                sel = back;
+                            draw_control_settings(mp, sel, controls, setup);
+                            break;
+                        case SDLK_RIGHT:
+                            if (sel == edit_controls)
+                                sel = back;
+                            else
+                                sel = edit_controls;
+                            draw_control_settings(mp, sel, controls, setup);
+                            break;
+                        case SDLK_RETURN:
+                            if(sel == back)
+                                keep_running = false;
+                            else
+                                sel = 0;
+                                setup = true;
+                                break;
+                    }
+                } else {
+                    switch (event.key.keysym.sym) {
+                        case SDLK_UP:
+                            if (sel == forward_s)
+                                sel = back_s;
+                            else
+                                sel--;
+                            draw_control_settings(mp,sel,controls,setup);
+                            break;
+                        case SDLK_DOWN:
+                            if (sel == back_s)
+                                sel = forward_s;
+                            else
+                                sel++;
+                            draw_control_settings(mp,sel,controls,setup);
+                            break;
+                        case SDLK_RETURN:
+                            if (sel == back_s)
+                                setup = false;
+                            draw_control_settings(mp,sel,controls,setup);
+                            save_controls(controls);
+                            break;
+                        default:
+                            switch (sel%5) {
+                                case forward_s:
+                                    controls.forward = event.key.keysym.sym;
+                                    break;
+                                case backward_s:
+                                    controls.backward = event.key.keysym.sym;
+                                    break;
+                                case left_s:
+                                    controls.left = event.key.keysym.sym;
+                                    break;
+                                case right_s:
+                                    controls.right = event.key.keysym.sym;
+                                    break;
+                                case back_s:
+                                    break;
+                            }
+                            draw_control_settings(mp,sel,controls,setup);
+                            break;
+                    }
                 }
             }
         }
     }
 }
+
+//                                   A megjelenítést kezelő menü függvénye
+//----------------------------------------------------------------------------------------------------------------------
 
 void display_settings(MenuProperties mp, int sel) {
     //SDL_GetWindowSize(mp.window, &mp.SCREEN_HEIGHT, &mp.SCREEN_WIDTH);
@@ -572,6 +827,9 @@ void display_settings(MenuProperties mp, int sel) {
     }
 }
 
+//                                        A beállításokat kezelő almenü
+//----------------------------------------------------------------------------------------------------------------------
+
 void settings_menu(MenuProperties menuProperties, int sel) {
     //SDL_GetWindowSize(menuProperties.window, &menuProperties.SCREEN_HEIGHT, &menuProperties.SCREEN_WIDTH);
     enum {
@@ -627,6 +885,9 @@ void settings_menu(MenuProperties menuProperties, int sel) {
         }
     }
 }
+
+//                               Az főmenü függvénye
+//----------------------------------------------------------------------------------------------------------------------
 
 void init_main_menu(SDL_Window *window, SDL_Renderer *renderer, int SCREEN_WIDTH, int SCREEN_HEIGHT) {
     //SDL_GetWindowSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
