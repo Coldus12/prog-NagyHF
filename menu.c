@@ -86,6 +86,20 @@ int merge_int_list(int_list* head) {
     return (int) strtol(egybe, NULL, 10);
 }
 
+//                             Dicsőséglista beolvasása, kiírása, mentése
+//----------------------------------------------------------------------------------------------------------------------
+
+int_list* read_reacords_from_file(char* path, char* name_of_the_map) {
+    FILE *fp = fopen(path, "r");
+
+    char line[100];
+    while (fgets(line, sizeof(line),fp) != NULL) {
+
+    }
+
+    fclose(fp);
+}
+
 //                                  Felbontás betöltése és mentése
 //----------------------------------------------------------------------------------------------------------------------
 

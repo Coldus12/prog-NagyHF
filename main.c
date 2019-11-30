@@ -9,15 +9,27 @@
 #include "debugmalloc-impl.h"
 #include "debugmalloc.h"
 
+/*TODO
+ * Dicsőséglista
+ *      kiírása
+ *      mentése
+ * Játék
+ *      pálya kiválasztása
+ *      kocsi modell
+ *      belső nézet
+ *      irány-vektor
+ *      win-condition
+ * */
+
 int main( int argc, char* args[] ) {
     int SCREEN_WIDTH = 1280;
     int SCREEN_HEIGHT = 960;
 
     load_resolutions(&SCREEN_WIDTH, &SCREEN_HEIGHT);
-    Point kezodhelyzet = {0, 0, 0};
+    /*Point kezodhelyzet = {0, 0, 0};
     Player player = initPlayer(kezodhelyzet,300,"fa.txt",SCREEN_WIDTH,SCREEN_HEIGHT, 0);
     //printf("player lofasz: %d\n",player.thirdPersonView.planeSizeY);
-    free_player(&player);
+    free_player(&player);*/
 
     //                                           SDL ablak létrehozása
     //------------------------------------------------------------------------------------------------------------------

@@ -1,4 +1,5 @@
 korut korut.txt
 hegy1 hegy.txt
 hegy2 hegy2.txt
+khegy kulso_hegy.txt
 fa fa.txt

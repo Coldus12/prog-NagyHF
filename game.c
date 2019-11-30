@@ -21,22 +21,27 @@
 #include "debugmalloc-impl.h"
 #include "debugmalloc.h"
 #include "menu.h"
+#include "player.h"
 
 void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int SCREEN_HEIGHT, char* path_to_mod_ist, char* path_to_map) {
-
-    //                                          Iránítás betöltése
+    //                                          Irányítás betöltése
     //------------------------------------------------------------------------------------------------------------------
     Controls controls;
     load_controls(&controls);
+
+    //                                              Játékos
+    //------------------------------------------------------------------------------------------------------------------
+    Point play_location = {680,100,470};
+    Player player = initPlayer(play_location,300,"auto.txt",SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
     //                                          Map és társai
     //------------------------------------------------------------------------------------------------------------------
     model_list *mod_list;
     map *mapy = NULL;
-    Point location = {300,100,300};
+    Point location = {0,100,0};
 
-    invis_wall* belso = load_invis_wall_from_file("korpalya_belso_invis.txt", location, 10);
-    invis_wall* kulso = load_invis_wall_from_file("korpalya_kulso_invis.txt",location,30);
+    //invis_wall* belso = load_invis_wall_from_file("korpalya_belso_invis.txt", location, 20);
+    //invis_wall* kulso = load_invis_wall_from_file("korpalya_kulso_invis.txt",location,20);
 
     mod_list = load_model_list(path_to_mod_ist);
     mapy = load_map_from_file(path_to_map, mapy, *mod_list);
@@ -46,7 +51,7 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
     Camera cam;
 
     cam.location.posX = 330;
-    cam.location.posY = 100;
+    cam.location.posY = 120;
     cam.location.posZ = 80;
     cam.distanceFromPlane = 700;
     cam.planeSizeX = SCREEN_WIDTH;
@@ -57,7 +62,7 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
     //                                          Objektumok és Modelek
     //------------------------------------------------------------------------------------------------------------------
     /*Model cube;
-    load_model_from_file("/home/coldus/Desktop/hegy2.txt", &cube);
+    load_model_from_file("kulso_hegy.txt", &cube);
     //Point point;
 
     Object cube1, cube2, cube3, cube4;
@@ -68,7 +73,7 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
 
     //                             Objektum, és a kamera kezdeti értékeinek beállítása
     //------------------------------------------------------------------------------------------------------------------
-    int x = 0,y = 0,z = 0;
+    double x = 0,y = 0,z = 0;
     int a = 0, b = 0, c = 0;
 
     double degree = (M_PI/180.0);
@@ -85,7 +90,8 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
     RList *head = NULL;
 
     //head = addObjectToRenderList(head, cam, &cube1);
-    head = addMapToRenderList(head,cam,mapy);
+    head = addObjectToRenderList(head, player.thirdPersonView,&player.playerObject);
+    head = addMapToRenderList(head,player.firstPersonView,mapy);
 
     double rot = 0;
 
@@ -101,13 +107,18 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
                 if (keycode == SDLK_ESCAPE) {
                     keep_running = false;
                 } else if (keycode == controls.forward) {
-                    z+=10;
+                    if (player.velocity <= 10)
+                        player.velocity++;
+                    printf("%.0lf\n", player.velocity);
                 } else if (keycode == controls.backward) {
-                    z-=10;
+                    if (player.velocity > 0)
+                        player.velocity--;
                 } else if (keycode == controls.left) {
-                    x-=10;
+                    player.direction += 1*degree;
+                    a = 1;
                 } else if (keycode == controls.right) {
-                    x+=10;
+                    player.direction += -1*degree;
+                    a = -1;
                 }
                 /*switch (ev.key.keysym.sym) {
                     case SDLK_UP:
@@ -154,23 +165,36 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
             }
         }
 
+        //x = player.velocity*(cos(player.direction+M_PI/2.0));
+        //z = player.velocity*(sin(player.direction+M_PI/2.0));
+        //printf("x:%.0lf y:%.0lf , szög:%.2f\n",x,z, player.direction*degree);
+
         /*if (rot < 360)
             rot += 0.0001;
         else
             rot = 0;*/
 
         //Kamera mozgatása a térben
-        if (point_inside_invis_walls(belso, cam.location) || point_outside_invis_walls(kulso,cam.location)) {
-            cam.location.posX -= x;
-            cam.location.posY -= y;
-            cam.location.posZ -= z;
-            //printf("bünn!!\n");
-        } else {
-            cam.location.posX += x;
-            cam.location.posY += y;
-            cam.location.posZ += z;
+        /*if (point_inside_invis_walls(belso, player.location) || point_outside_invis_walls(kulso,player.location)) {
+            player.location.posX -= x;
+            player.location.posY -= y;
+            player.location.posZ -= z;
+            printf("bünn!!\n");
+        } else {*/
+            //player.location.posX += x;
+            //player.location.posY += y;
+            //player.location.posZ += z;
             //printf("benn\n");
-        }
+        //}
+
+        updatePlayer(&player);
+        //printf("%.0lf %.0lf %.0lf\n",player.location.posX, player.location.posY, player.location.posZ);
+        /*cam.location.posX += x;
+        cam.location.posY += y;
+        cam.location.posZ += z;*/
+
+
+        //printf("Kamera poz: x: %.0lf y: %.0lf z: %.0lf\n", cam.location.posX, cam.location.posY, cam.location.posZ);
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
@@ -178,14 +202,16 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
         //rotate_Object_around_Point(cube1.location,&cube1, 0, rot*degree, 0);
 
         //Kamera forgatása
-        cam.rotX = a*10*degree;
+        /*cam.rotX = a*10*degree;
         cam.rotY = b*10*degree;
-        cam.rotZ = c*10*degree;
+        cam.rotZ = c*10*degree;*/
 
-        head = render_RList(head, cam, renderer);
+        //rotate_Object_around_Point(player.playerObject.location, &player.playerObject,0,-a*degree,0);
+        head = render_RList(head, player.thirdPersonView, renderer);
 
         SDL_RenderPresent(renderer);
 
+        a = 0;
         /*Az x, y, z értékeket 0-ba állítom, mert, ha nem állítanám,
          * akkor egy gombnyomás után folyamatosan növelnék
          * a koordináták értékét.
@@ -203,10 +229,12 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
 
     SDL_DestroyWindow(window);
 
-    free_invis_wall(belso);
-    free_invis_wall(kulso);
+    //free_invis_wall(belso);
+    //free_invis_wall(kulso);
     free_model_list(mod_list);
     free_object_list(mapy);
+
+    free_player(&player);
 
     freeList(head);
 }

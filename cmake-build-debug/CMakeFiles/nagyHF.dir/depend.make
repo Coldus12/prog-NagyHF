@@ -7,6 +7,7 @@ CMakeFiles/nagyHF.dir/game.c.o: ../game.c
 CMakeFiles/nagyHF.dir/game.c.o: ../map.h
 CMakeFiles/nagyHF.dir/game.c.o: ../menu.h
 CMakeFiles/nagyHF.dir/game.c.o: ../object.h
+CMakeFiles/nagyHF.dir/game.c.o: ../player.h
 CMakeFiles/nagyHF.dir/game.c.o: ../renderer.h
 CMakeFiles/nagyHF.dir/game.c.o: /usr/include/SDL2/SDL.h
 CMakeFiles/nagyHF.dir/game.c.o: /usr/include/SDL2/SDL2_gfxPrimitives.h

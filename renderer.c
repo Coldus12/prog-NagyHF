@@ -75,7 +75,7 @@ Point interRenderPoint(Camera cam, Point p) {
          * Ezzel szemben az y-t nem elég az ablak magasságának felével eltolni, hiszen a képernyő y tengelye
          * ellentétes irányú, így az y ellentetjét kell vennünk, és ahhoz kell hozzáadnunk az
          * ablak magasságának a felét.
-         * */
+         */
 
         vetulet.posY = ((double) cam.planeSizeY/2) - relativY;
         vetulet.posX = ((double) cam.planeSizeX/2) + relativX;
@@ -358,25 +358,6 @@ bool is_point_inside_trigon(Camera cam, Point p, triangle tri) {
     if((c.posX-b.posX)*(p.posY-b.posY)-(c.posY-b.posY)*(p.posX-b.posX) > 0 != s_ab) return false;
 
     return true;
-}
-
-RList* change_stuff(RList* head, Camera cam) {
-    int size = 0;
-    RList *current = head;
-    while (current != NULL) {
-        size++;
-        current = current->next;
-    }
-
-    for (int i = size-1; i > 0; --i) {
-        for (int j = 0; j < i; ++j) {
-            if (is_point_inside_trigon(cam, centroid_of_triangle(*getListItem(head, i)->tri), *getListItem(head, j)->tri)) {
-                head = swap(head, i, j);
-            }
-        }
-    }
-
-    return head;
 }
 
 //                                      RList render függvénye
