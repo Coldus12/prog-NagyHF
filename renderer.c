@@ -6,6 +6,7 @@
 
 #include <SDL_render.h>
 #include <SDL2_gfxPrimitives.h>
+#include <time.h>
 
 #include "map.h"
 
@@ -81,6 +82,9 @@ Point interRenderPoint(Camera cam, Point p) {
         vetulet.posX = ((double) cam.planeSizeX/2) + relativX;
     }
 
+    vetulet.posY = ((double) cam.planeSizeY/2) - relativY;
+    vetulet.posX = ((double) cam.planeSizeX/2) + relativX;
+
     return vetulet;
 }
 
@@ -91,7 +95,7 @@ Point interRenderPoint(Camera cam, Point p) {
  * ki a megfelelő színű háromszöget.
  * */
 
-void renderTriangle(triangle tri, Camera cam, SDL_Renderer *SDL_renderer) {
+/*void renderTriangle(triangle tri, Camera cam, SDL_Renderer *SDL_renderer) {
     Point p1, p2, p3;
 
     p1 = interRenderPoint(cam, tri.p1);
@@ -101,6 +105,133 @@ void renderTriangle(triangle tri, Camera cam, SDL_Renderer *SDL_renderer) {
     if (p1.posZ != -1 && p2.posZ != -1 && p3.posZ != -1) {
         filledTrigonRGBA(SDL_renderer, p1.posX, p1.posY, p2.posX, p2.posY, p3.posX, p3.posY, tri.r, tri.g, tri.b, 255);
         trigonRGBA(SDL_renderer, p1.posX, p1.posY, p2.posX, p2.posY, p3.posX, p3.posY, 0, 0, 0, 255);
+    }
+}*/
+
+Point inter_render_behind(Camera cam, Point behind, Point p) {
+    Point rotated;
+    rotated = behind;
+
+    rotate_Point_around_Point(cam.location, &rotated, cam.rotX, cam.rotY, cam.rotZ);
+
+    Point vetulet;
+    vetulet.posZ = 0;
+
+    double relativY = (cam.location.posY - behind.posY) - ((p.posY - behind.posY)/(p.posZ - behind.posZ))*(cam.location.posZ - behind.posZ + cam.distanceFromPlane);
+    double relativX = (cam.location.posX - behind.posY) - ((p.posX - behind.posX)/(p.posZ - behind.posZ))*(cam.location.posZ - behind.posZ + cam.distanceFromPlane);
+
+    vetulet.posY = ((double) cam.planeSizeY/2) - relativY;
+    vetulet.posX = ((double) cam.planeSizeX/2) + relativX;
+
+
+    return vetulet;
+}
+
+/*void render_trig_onePoint_behind(Point pointBehind, Point p1, Point p2, Camera cam, SDL_Renderer *SDL_renderer, SDL_Color color) {
+    Point temp1, temp2;
+    temp1 = pointBehind;
+    temp2 = pointBehind;
+
+    double dx, dy, dz, realDist;
+    dx = pointBehind.posX-p1.posX;
+    dy = pointBehind.posY-p1.posY;
+    dz = pointBehind.posZ-p1.posZ;
+    realDist = (cam.location.posZ - pointBehind.posZ) + cam.distanceFromPlane;
+
+    temp1.posX = ((double) cam.planeSizeX/2.0) + ((cam.location.posX - pointBehind.posX) - ((dx/dz)*realDist));
+    temp1.posY = ((double) cam.planeSizeY/2.0) - ((cam.location.posY - pointBehind.posY) - ((dy/dz)*realDist));
+
+    //temp1.posX = ((double) cam.planeSizeX/2.0 + (pointBehind.posX - cam.location.posX)) + (dx/dz)*realDist;
+    //temp1.posY = ((double) cam.planeSizeY/2.0 + (cam.location.posY-pointBehind.posY)) - (dy/dz)*realDist;
+    //temp1.posZ = cam.location.posZ + cam.distanceFromPlane;
+
+    dx = pointBehind.posX-p2.posX;
+    dy = pointBehind.posY-p2.posY;
+    dz = pointBehind.posZ-p2.posZ;
+    realDist = (cam.location.posZ - pointBehind.posZ) + cam.distanceFromPlane;
+
+    temp2.posX = ((double) cam.planeSizeX/2.0) + ((cam.location.posX - pointBehind.posX) - ((dx/dz)*realDist));
+    temp2.posY = ((double) cam.planeSizeY/2.0) - ((cam.location.posY - pointBehind.posY) - ((dy/dz)*realDist));
+    //temp2.posZ = cam.location.posZ + cam.distanceFromPlane;
+
+    //temp1 = interRenderPoint(cam, temp1);
+    //temp2 = interRenderPoint(cam, temp2);
+    p1 = interRenderPoint(cam, p1);
+    p2 = interRenderPoint(cam, p2);
+
+    filledTrigonRGBA(SDL_renderer,temp1.posX,temp1.posY,p1.posX,p1.posY,p2.posX,p2.posY,color.r, color.g,color.b,255);
+    filledTrigonRGBA(SDL_renderer,temp2.posX,temp2.posY,p1.posX,p1.posY,p2.posX,p2.posY,color.r,color.g,color.b,255);
+    filledTrigonRGBA(SDL_renderer,temp1.posX,temp1.posY,p1.posX,p1.posY,p2.posX,p2.posY,0, 0,255,255);
+    filledTrigonRGBA(SDL_renderer,temp2.posX,temp2.posY,p1.posX,p1.posY,p2.posX,p2.posY,0,0,255,255);
+}
+
+void render_trig_twoPoint_behind(Point visiblepoint, Point behind1, Point behind2, Camera cam, SDL_Renderer *SDL_renderer, SDL_Color color) {
+    double dx, dy, dz, realDist;
+    dx = behind1.posX-visiblepoint.posX;
+    dy = behind1.posY-visiblepoint.posY;
+    dz = behind1.posZ-visiblepoint.posZ;
+    realDist = (cam.location.posZ - behind1.posZ) + cam.distanceFromPlane;
+
+    behind1.posX = ((double) cam.planeSizeX/2.0) + ((cam.location.posX - behind1.posX) - ((dx/dz)*realDist));
+    behind1.posY = ((double) cam.planeSizeY/2.0) - ((cam.location.posY - behind1.posY) - ((dy/dz)*realDist));
+    //behind1.posZ = cam.location.posZ + cam.distanceFromPlane;
+
+    dx = behind2.posX-visiblepoint.posX;
+    dy = behind2.posY-visiblepoint.posY;
+    dz = behind2.posZ-visiblepoint.posZ;
+    realDist = (cam.location.posZ - behind2.posZ) + cam.distanceFromPlane;
+
+    behind2.posX = ((double) cam.planeSizeX/2.0) + ((cam.location.posX - behind2.posX) - ((dx/dz)*realDist));
+    behind2.posY = ((double) cam.planeSizeY/2.0) - ((cam.location.posY - behind2.posY) - ((dy/dz)*realDist));
+    //behind2.posZ = cam.location.posZ + cam.distanceFromPlane;
+
+    //behind1 = interRenderPoint(cam, behind1);
+    //behind2 = interRenderPoint(cam, behind2);
+    visiblepoint = interRenderPoint(cam, visiblepoint);
+
+    filledTrigonRGBA(SDL_renderer,behind1.posX,behind1.posY, behind2.posX,behind2.posY,visiblepoint.posX,visiblepoint.posY,color.r,color.g,color.b,255);
+}*/
+
+void render_trig_one_point_behind(SDL_Renderer *SDL_renderer, Camera cam, Point behind, Point p1, Point p2, SDL_Color color) {
+    Point b1, b2;
+
+    p1 = interRenderPoint(cam, p1);
+    p2 = interRenderPoint(cam, p2);
+
+    b1 = inter_render_behind(cam, behind, p1);
+    b2 = inter_render_behind(cam, behind, p2);
+
+    filledTrigonRGBA(SDL_renderer, p1.posX, p1.posY, p2.posX, p2.posY, b1.posX, b1.posY, color.r, color.g, color.b, 255);
+    trigonRGBA(SDL_renderer, p1.posX, p1.posY, p2.posX, p2.posY, b1.posX, b1.posY, 0, 0, 0, 255);
+
+    filledTrigonRGBA(SDL_renderer, p1.posX, p1.posY, p2.posX, p2.posY, b2.posX, b2.posY, color.r, color.g, color.b, 255);
+    trigonRGBA(SDL_renderer, p1.posX, p1.posY, p2.posX, p2.posY, b2.posX, b2.posY, 0, 0, 0, 255);
+}
+
+void render_trig_two_point_behind(SDL_Renderer *SDL_renderer, Camera cam, Point behind1, Point behind2, Point p, SDL_Color color) {
+    p = interRenderPoint(cam, p);
+
+    behind1 = inter_render_behind(cam, behind1, p);
+    behind2 = inter_render_behind(cam, behind2, p);
+
+    filledTrigonRGBA(SDL_renderer, p.posX, p.posY, behind2.posX, behind2.posY, behind1.posX, behind1.posY, color.r, color.g, color.b, 255);
+    trigonRGBA(SDL_renderer, p.posX, p.posY, behind2.posX, behind2.posY, behind1.posX, behind1.posY, 0, 0, 0, 255);
+}
+
+int vmi = 0;
+
+void renderTriangle(triangle tri, Camera cam, SDL_Renderer *SDL_renderer) {
+    //------------------------------------------------------------------------------------------------------------------
+    Point p1, p2, p3;
+
+    p1 = interRenderPoint(cam, tri.p1);
+    p2 = interRenderPoint(cam, tri.p2);
+    p3 = interRenderPoint(cam, tri.p3);
+
+    if (p1.posZ != -1 && p2.posZ != -1 && p3.posZ != -1) {
+        //filledTrigonRGBA(SDL_renderer, p1.posX, p1.posY, p2.posX, p2.posY, p3.posX, p3.posY, tri.r, tri.g, tri.b, 255);
+        trigonRGBA(SDL_renderer, p1.posX, p1.posY, p2.posX, p2.posY, p3.posX, p3.posY, 0, 0, 0, 255);
+
     }
 }
 
@@ -117,6 +248,119 @@ void renderObject(Object object, Camera cam, SDL_Renderer *SDL_renderer) {
         renderTriangle(object.model.triangleArray.triangles[i], cam, SDL_renderer);
     }
 }
+
+//                                              RenderArray
+//----------------------------------------------------------------------------------------------------------------------
+typedef struct RenderArray{triangle **tri; int size} RenderArray;
+
+void init_render_array(RenderArray* din_array, int size) {
+    din_array->tri = (triangle**) malloc(size * sizeof(triangle*));
+    din_array->size = size;
+}
+
+bool resize_render_array(RenderArray *din_array, int new_size) {
+    triangle **new_triangle = malloc(new_size* sizeof(triangle*));
+
+    for (int i = 0; i < new_size-1; i++) {
+        new_triangle[i] = din_array->tri[i];
+    }
+
+    free(din_array->tri);
+    din_array->size = new_size;
+    din_array->tri = new_triangle;
+}
+
+void free_render_array(RenderArray* din_array) {
+    free(din_array->tri);
+}
+
+void add_tri_to_RenderArray(RenderArray *ra, triangle* tri, double dist) {
+    resize_render_array(ra,ra->size+1);
+    tri->dist = dist;
+    ra->tri[ra->size-1] = tri;
+}
+
+void add_Object_to_RenderArray(RenderArray *ra, Camera cam, Object *obj) {
+    for (int i = 0; i < obj->model.triangleArray.size; i++) {
+        add_tri_to_RenderArray(ra, &obj->model.triangleArray.triangles[i], dist_btw_Points(cam.location, centroid_of_triangle(obj->model.triangleArray.triangles[i])));
+    }
+}
+
+void addMapToRenderArray(RenderArray *ra,map *map1, Camera cam) {
+    map *current = map1;
+    while(current != NULL) {
+        add_Object_to_RenderArray(ra,cam,&current->obj);
+        current = current->next;
+    }
+}
+
+/*void quicksort_on_render_array(RenderArray *ra, int min, int max) {
+    double pivot = ra->tri[(min+max)/2]->dist;
+    int i = min, j = max;
+    while (i <= j) {
+        while (ra->tri[i]->dist < pivot) ++i;
+        while (ra->tri[i]->dist > pivot) --j;
+        if (i <= j) {
+            triangle *tmp = ra->tri[i];
+            ra->tri[i] = ra->tri[j];
+            ra->tri[j] = tmp;
+            ++i;
+            --j;
+        }
+    }
+
+    if (min < j) quicksort_on_render_array(ra, min, j);
+    if (i < max) quicksort_on_render_array(ra, i, max);
+}*/
+
+void quicksort_on_render_array(RenderArray *ra, int min, int max) {
+    int i, j, pivot;
+    if(min < max){
+        pivot = min;
+        i = min;
+        j = max;
+
+        while(i<j){
+            while(ra->tri[i]->dist >= ra->tri[pivot]->dist && i<max)
+                i++;
+            while(ra->tri[j]->dist < ra->tri[pivot]->dist)
+                j--;
+            if(i<j){
+                triangle *tmp = ra->tri[i];
+                ra->tri[i] = ra->tri[j];
+                ra->tri[j] = tmp;
+            }
+        }
+
+        triangle *temp = ra->tri[pivot];
+        ra->tri[pivot] = ra->tri[j];
+        ra->tri[j] = temp;
+
+        quicksort_on_render_array(ra, min,j-1);
+        quicksort_on_render_array(ra ,j+1, max);
+
+    }
+}
+
+void update_distances_on_ra(RenderArray *ra, Camera cam) {
+    for (int i = 0; i < ra->size-1; i++) {
+        ra->tri[i]->dist = dist_btw_Points(cam.location, centroid_of_triangle(*ra->tri[i]));
+    }
+}
+
+void render_ra(RenderArray *ra, Camera cam, SDL_Renderer *SDL_Renderer) {
+    update_distances_on_ra(ra,cam);
+    quicksort_on_render_array(ra, 0, ra->size-1);
+    //bubble_sort_ra(ra);
+    for (int i = 0; i < ra->size-1; i++) {
+        if (cam.viewDistance > 0) {
+            if (ra->tri[i]->dist > cam.viewDistance)
+                return;
+        }
+        renderTriangle(*ra->tri[i],cam, SDL_Renderer);
+    }
+}
+
 
 //                                              RenderList
 //----------------------------------------------------------------------------------------------------------------------
@@ -321,6 +565,28 @@ RList* bubble_sort_by_dist(RList *head) {
     return head;
 }
 
+RList* selection_sort_RList(RList* head) {
+    int size = 0;
+    RList *current = head;
+    while (current != NULL) {
+        size++;
+        current = current->next;
+    }
+
+    for (int i = 0; i < size-1; ++i) {
+        int minindex = i;
+        for (int j = i+1; j < size; ++j)
+            if (getListItem(head,j)->dist > getListItem(head,minindex)->dist)
+                minindex = j;
+
+        if (minindex != i) {
+            head = swap(head, minindex, i);
+        }
+    }
+
+    return head;
+}
+
 /*! Az update_distances függvényre azért van szükség, mert ha a kamera, vagy egy objektum helyzete
  * megváltozik, akkor a kettőjük közti távolsága is megváltozik, és ez alaján lehet, hogy a lista
  * sorrendjén is változtatni kell, így elengedhetetlen, hogy a RenderList megjelenítése elött
@@ -336,30 +602,6 @@ RList* update_distances(RList* head, Camera cam) {
     return head;
 }
 
-/*! Eznnek a függvénynek a gondolatmenetét a
- * https://stackoverflow.com/a/9755252/4589636
- * oldalról, phuclv nevű felhasználótól vettem
- * mert a saját logikán alapuló próbálkozásaim
- * sikertelennek bizonyltak.
- * */
-bool is_point_inside_trigon(Camera cam, Point p, triangle tri) {
-    Point a = interRenderPoint(cam, tri.p1);
-    Point b = interRenderPoint(cam, tri.p2);
-    Point c = interRenderPoint(cam, tri.p3);
-
-
-    double as_x = p.posX-a.posX;
-    double as_y = p.posY-a.posY;
-
-    bool s_ab = (b.posX-a.posX)*as_y-(b.posY-a.posY)*as_x > 0;
-
-    if((c.posX-a.posX)*as_y-(c.posY-a.posY)*as_x > 0 == s_ab) return false;
-
-    if((c.posX-b.posX)*(p.posY-b.posY)-(c.posY-b.posY)*(p.posX-b.posX) > 0 != s_ab) return false;
-
-    return true;
-}
-
 //                                      RList render függvénye
 //----------------------------------------------------------------------------------------------------------------------
 /*! A render_RList függvény azt csinálja, amit a neve is sugall. Megjeleníti a RenderList-ben szereplő
@@ -373,8 +615,10 @@ bool is_point_inside_trigon(Camera cam, Point p, triangle tri) {
  * 0 és a látótávolság között van.
  * */
 RList* render_RList(RList *head, Camera cam, SDL_Renderer *SDL_Renderer) {
+    clock_t start = clock();
     head = update_distances(head, cam);
     head = bubble_sort_by_dist(head);
+    //head = selection_sort_RList(head);
     //head = change_stuff(head, cam);
     RList *current = head;
 
@@ -388,6 +632,10 @@ RList* render_RList(RList *head, Camera cam, SDL_Renderer *SDL_Renderer) {
         current = current->next;
     }
 
+
+    clock_t stop = clock();
+    double deltaClock = ((double) stop-start)/CLOCKS_PER_SEC;
+    printf("%d %.5lf\n", ++vmi,deltaClock);
     return head;
 }
 

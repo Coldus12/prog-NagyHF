@@ -32,7 +32,7 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
     //                                              Játékos
     //------------------------------------------------------------------------------------------------------------------
     Point play_location = {680,100,470};
-    Player player = initPlayer(play_location,300,"auto.txt",SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+    Player player = initPlayer(play_location,650,"auto.txt",SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
     //                                          Map és társai
     //------------------------------------------------------------------------------------------------------------------
@@ -40,8 +40,8 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
     map *mapy = NULL;
     Point location = {0,100,0};
 
-    //invis_wall* belso = load_invis_wall_from_file("korpalya_belso_invis.txt", location, 20);
-    //invis_wall* kulso = load_invis_wall_from_file("korpalya_kulso_invis.txt",location,20);
+    invis_wall* belso = load_invis_wall_from_file("korpalya_belso_invis.txt", location, 20);
+    invis_wall* kulso = load_invis_wall_from_file("korpalya_kulso_invis.txt",location,20);
 
     mod_list = load_model_list(path_to_mod_ist);
     mapy = load_map_from_file(path_to_map, mapy, *mod_list);
@@ -58,18 +58,18 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
     cam.planeSizeY = SCREEN_HEIGHT;
     //cam.viewDistance = 1000;
     //Így nincs renderDistance gyakorlatilag
-    cam.viewDistance = -1;
+    cam.viewDistance = 1000;
     //                                          Objektumok és Modelek
     //------------------------------------------------------------------------------------------------------------------
     /*Model cube;
-    load_model_from_file("kulso_hegy.txt", &cube);
+    load_model_from_file("test_trigon.txt", &cube);
     //Point point;
 
     Object cube1, cube2, cube3, cube4;
     cube1.location.posX = 300;
     cube1.location.posY = 100;
     cube1.location.posZ = 300;
-    load_Model_into_Object(&cube1, cube,10);*/
+    load_Model_into_Object(&cube1, cube,50);*/
 
     //                             Objektum, és a kamera kezdeti értékeinek beállítása
     //------------------------------------------------------------------------------------------------------------------
@@ -90,14 +90,23 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
     RList *head = NULL;
 
     //head = addObjectToRenderList(head, cam, &cube1);
+
+    //head = addMapToRenderList(head,cam,mapy);
+
     head = addObjectToRenderList(head, player.thirdPersonView,&player.playerObject);
-    head = addMapToRenderList(head,player.firstPersonView,mapy);
+    head = addMapToRenderList(head,player.thirdPersonView,mapy);
+
+    /*RenderArray ra;
+    init_render_array(&ra,0);
+    add_Object_to_RenderArray(&ra, cam, &player.playerObject);
+    addMapToRenderArray(&ra, mapy, player.thirdPersonView);*/
 
     double rot = 0;
 
     double secsPerFrame = 1.0/50.0;
     bool keep_running = true;
     while (keep_running) {
+        clock_t start = clock();
         double most = time(NULL);
         for(SDL_Event ev; SDL_PollEvent(&ev);) {
             if(ev.type == SDL_QUIT) {
@@ -164,7 +173,10 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
                 }*/
             }
         }
-
+        //player.velocity = 10;
+        clock_t cc = clock();
+        double deltaa = ((double) (cc - start) / CLOCKS_PER_SEC);
+        int a = 0;
         //x = player.velocity*(cos(player.direction+M_PI/2.0));
         //z = player.velocity*(sin(player.direction+M_PI/2.0));
         //printf("x:%.0lf y:%.0lf , szög:%.2f\n",x,z, player.direction*degree);
@@ -176,51 +188,38 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
 
         //Kamera mozgatása a térben
         /*if (point_inside_invis_walls(belso, player.location) || point_outside_invis_walls(kulso,player.location)) {
-            player.location.posX -= x;
-            player.location.posY -= y;
-            player.location.posZ -= z;
-            printf("bünn!!\n");
-        } else {*/
+
+            //player.velocity = 0;
+            //printf("bent\n");
+        } else {
+
+            //printf("kint\n");
+        }*//*else {
             //player.location.posX += x;
             //player.location.posY += y;
             //player.location.posZ += z;
             //printf("benn\n");
-        //}
+        }*/
 
         updatePlayer(&player);
-        //printf("%.0lf %.0lf %.0lf\n",player.location.posX, player.location.posY, player.location.posZ);
-        /*cam.location.posX += x;
-        cam.location.posY += y;
-        cam.location.posZ += z;*/
-
-
-        //printf("Kamera poz: x: %.0lf y: %.0lf z: %.0lf\n", cam.location.posX, cam.location.posY, cam.location.posZ);
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
         SDL_RenderClear(renderer);
-
-        //rotate_Object_around_Point(cube1.location,&cube1, 0, rot*degree, 0);
-
-        //Kamera forgatása
-        /*cam.rotX = a*10*degree;
-        cam.rotY = b*10*degree;
-        cam.rotZ = c*10*degree;*/
 
         //rotate_Object_around_Point(player.playerObject.location, &player.playerObject,0,-a*degree,0);
         head = render_RList(head, player.thirdPersonView, renderer);
 
+        clock_t stop = clock();
+        double deltaClock = ((double) stop-start)/CLOCKS_PER_SEC;
+        //head = render_RList(head, cam, renderer);
+        //render_ra(&ra,player.thirdPersonView, renderer);
+
         SDL_RenderPresent(renderer);
+        //SDL_DestroyRenderer(renderer);
 
-        a = 0;
-        /*Az x, y, z értékeket 0-ba állítom, mert, ha nem állítanám,
-         * akkor egy gombnyomás után folyamatosan növelnék
-         * a koordináták értékét.
-         */
-        x = 0;
-        y = 0;
-        z = 0;
-
-        usleep(secsPerFrame*1000000);
+        //usleep(secsPerFrame);
+        //SDL_Delay(secsPerFrame);
     }
 
     //print_invis(belso);
@@ -229,12 +228,13 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
 
     SDL_DestroyWindow(window);
 
-    //free_invis_wall(belso);
-    //free_invis_wall(kulso);
+    free_invis_wall(belso);
+    free_invis_wall(kulso);
     free_model_list(mod_list);
     free_object_list(mapy);
 
     free_player(&player);
+    //free_render_array(&ra);
 
     freeList(head);
 }

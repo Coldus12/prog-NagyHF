@@ -30,5 +30,17 @@ void freeList(RList *head);
 RList* update_distances(RList* head, Camera cam);
 RList* render_RList(RList *head, Camera cam, SDL_Renderer *SDL_Renderer);
 
+typedef struct RenderArray{triangle **tri; int size} RenderArray;
+
+void init_render_array(RenderArray* din_array, int size);
+bool resize_render_array(RenderArray *din_array, int new_size);
+void free_render_array(RenderArray* din_array);
+void add_tri_to_RenderArray(RenderArray *ra, triangle* tri, double dist);
+void add_Object_to_RenderArray(RenderArray *ra, Camera cam, Object *obj);
+void addMapToRenderArray(RenderArray *ra,map *map1, Camera cam);
+void quicksort_on_render_array(RenderArray *ra, int min, int max);
+void update_distances_on_ra(RenderArray *ra, Camera cam);
+void render_ra(RenderArray *ra, Camera cam, SDL_Renderer *SDL_Renderer);
+
 
 #endif //NAGYHF_RENDERER_H

@@ -5,6 +5,8 @@
 #ifndef player
 #define player
 
+#include <bits/time.h>
+#include <time.h>
 #include "renderer.h"
 
 //A pont és a vektor jelen esetbenkét egymással felcserélhető fogalom, a program pontnak hívja a játékos
@@ -23,7 +25,7 @@ Player initPlayer(Point playerLocation, double thirdPersonView_dist, char* path_
 
     Object player_obj;
     player_obj.location = playerLocation;
-    load_Model_into_Object(&player_obj, player_model, 5);
+    load_Model_into_Object(&player_obj, player_model, 0.5);
     //rotate_Object_around_Point(player_obj.location, &player_obj, 0, 180*degree, 0);
 
     player_obj.angle_from_y_axis = 180*degree;
@@ -55,6 +57,7 @@ Player initPlayer(Point playerLocation, double thirdPersonView_dist, char* path_
 }
 
 void updatePlayer(Player *play) {
+    clock_t start = clock();
     //A velocity-t egy (0,1)-es vektorként tekintve
     //play->location.posX += play->velocity*
     play->location.posX += play->velocity*(-sin(play->direction));
@@ -64,7 +67,9 @@ void updatePlayer(Player *play) {
     play->thirdPersonView.location.posY += play->third_person_dist;
 
     play->firstPersonView.location = play->location;
+    play->firstPersonView.rotY = play->direction;
     move_Object_to_Point(&play->playerObject,play->location);
+    play->firstPersonView.location.posY += 10;
 
     if (play->direction != play->playerObject.angle_from_y_axis) {
         double dAngle = play->playerObject.angle_from_y_axis - play->direction;
@@ -72,6 +77,10 @@ void updatePlayer(Player *play) {
         play->playerObject.angle_from_y_axis = play->direction;
     }
     //rotate_Object_around_Point(play->playerObject.location, &play->playerObject,0,play->direction*(M_PI/180.0),0);
+
+    clock_t stop = clock();
+    double deltaClock = ((double) stop-start)/CLOCKS_PER_SEC;
+
 }
 
 void free_player(Player *player1) {
