@@ -106,9 +106,6 @@ void free_model(Model *mod) {
  * Így fgets-et használok, ami soronként halad, majd a sort sscanf()-el dolgozom fel.
  * */
 
-/*TODO
- * Ha az initben 0-ról bármire változtatjuk a tömb méretét, akkor minden elromlik..
- * */
 void load_model_from_file(char *filename, Model *mod) {
     //Haromszogek
     triangle_array tri_array;
@@ -128,26 +125,18 @@ void load_model_from_file(char *filename, Model *mod) {
 
     char str[10], str2[10], str3[10], str4[10], str5[10];
 
-    int sizeP = 0, sizeT = 0;
+    int sizeP = 0;
     char line[100];
     while(fgets(line,sizeof(line), fp) != NULL) {
         int a = sscanf(line, "%s %s %s %s %s", str, str2, str3, str4, str5);
 
         if (str[0] == 'p') {
-            /*sizeP++;
-            if (sizeP > pArray.size) {
-                resize_point_array(&pArray, sizeP);
-            }*/
             sizeP = ++pArray.size;
             resize_point_array(&pArray, sizeP);
             pArray.points[sizeP-1].posX = (int) strtol(str2, NULL, 10);
             pArray.points[sizeP-1].posY = (int) strtol(str3, NULL, 10);
             pArray.points[sizeP-1].posZ = (int) strtol(str4, NULL, 10);
         } else if (strstr(str, "tri") != NULL) {
-            /*sizeT++;
-            if (sizeT > tri_array.size) {
-                resize_triangle_array(&tri_array, sizeT);
-            }*/
             resize_triangle_array(&tri_array, ++tri_array.size);
             int x,y,z;
 
@@ -256,17 +245,6 @@ void move_Object_to_Point(Object *obj, Point point) {
     }
 
     obj->location = point;
-}
-
-void pont_eltolasa_masik_ponttol(Point center, Point *tolando, int meret) {
-    Point deltaP;
-}
-
-void resize_Object(Object *obj, int newSize) {
-
-    for (int i = 0; i < obj->model.triangleArray.size; i++) {
-
-    }
 }
 
 void free_object(Object *obj) {

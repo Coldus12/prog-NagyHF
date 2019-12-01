@@ -5,6 +5,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/nagyHF.dir/menu.c.o"
   "CMakeFiles/nagyHF.dir/object.c.o"
   "CMakeFiles/nagyHF.dir/player.c.o"
+  "CMakeFiles/nagyHF.dir/records.c.o"
   "CMakeFiles/nagyHF.dir/renderer.c.o"
   "nagyHF"
   "nagyHF.pdb"

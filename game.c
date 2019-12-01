@@ -22,7 +22,29 @@
 #include "debugmalloc.h"
 #include "menu.h"
 #include "player.h"
+#include "records.h"
 
+typedef struct rect{Point p1; Point p2; Point p3; Point p4} Rect;
+
+/*! A CheckWinCondition függvény tulajdonképpen csak azt vizsgálja meg, hogy egy
+ * pont benne van-e egy másik négy pont által meghatározott téglalapban.
+ * Hátránya az az, hogy semmi mást nem vizsgál, így azt sem tudja/tudhatja,
+ * hogy a játékos jó irányból lépett-e a "célnégyszögbe".
+ * */
+bool checkWinCondition(Point p, Rect rect) {
+    if ((rect.p1.posX < p.posX) && (p.posX < rect.p2.posX) && (rect.p1.posZ < p.posZ) && (p.posZ < rect.p3.posZ)) {
+        return true;
+    } else
+        return false;
+}
+
+/*! A játék főfüggvénye.
+ * Ez a függvény az, ami az egész játékot kezeli. A függvény úgy működik, hogy
+ * miután elindították a játékot, ez betölti a megfelelő pályát, és a hozzá tartozó
+ * láthatatlan falakat.
+ * Majd figyeli a megfelelő gombnyomásokat, melyeket a beállítás.txt nevű fájlból olvas ki.
+ * Ezek után kirajzoltatja a háromszögeket a megfelelő sorrendben.
+ * */
 void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int SCREEN_HEIGHT, char* path_to_mod_ist, char* path_to_map) {
     //                                          Irányítás betöltése
     //------------------------------------------------------------------------------------------------------------------
@@ -38,76 +60,31 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
     //------------------------------------------------------------------------------------------------------------------
     model_list *mod_list;
     map *mapy = NULL;
-    Point location = {0,100,0};
+    Point location = {300,100,300};
 
     invis_wall* belso = load_invis_wall_from_file("korpalya_belso_invis.txt", location, 20);
     invis_wall* kulso = load_invis_wall_from_file("korpalya_kulso_invis.txt",location,20);
 
     mod_list = load_model_list(path_to_mod_ist);
     mapy = load_map_from_file(path_to_map, mapy, *mod_list);
-
-    //                                          Camera inicializálása
-    //------------------------------------------------------------------------------------------------------------------
-    Camera cam;
-
-    cam.location.posX = 330;
-    cam.location.posY = 120;
-    cam.location.posZ = 80;
-    cam.distanceFromPlane = 700;
-    cam.planeSizeX = SCREEN_WIDTH;
-    cam.planeSizeY = SCREEN_HEIGHT;
-    //cam.viewDistance = 1000;
-    //Így nincs renderDistance gyakorlatilag
-    cam.viewDistance = 1000;
-    //                                          Objektumok és Modelek
-    //------------------------------------------------------------------------------------------------------------------
-    /*Model cube;
-    load_model_from_file("test_trigon.txt", &cube);
-    //Point point;
-
-    Object cube1, cube2, cube3, cube4;
-    cube1.location.posX = 300;
-    cube1.location.posY = 100;
-    cube1.location.posZ = 300;
-    load_Model_into_Object(&cube1, cube,50);*/
-
-    //                             Objektum, és a kamera kezdeti értékeinek beállítása
-    //------------------------------------------------------------------------------------------------------------------
-    double x = 0,y = 0,z = 0;
-    int a = 0, b = 0, c = 0;
-
     double degree = (M_PI/180.0);
-    Point point = {300, 100, 300};
-    Point p2 = {300+60, 100 ,300}, p3 = {300+60, 100, 300+60}, p4 = {300, 100, 300+60};
-    cam.rotX = 0*degree;
-    cam.rotY = 0*degree;
-    cam.rotZ = 0*degree;
-
-    //move_Object_to_Point(&cube1,point);
 
     //                                                  RenderList
     //------------------------------------------------------------------------------------------------------------------
     RList *head = NULL;
 
-    //head = addObjectToRenderList(head, cam, &cube1);
-
-    //head = addMapToRenderList(head,cam,mapy);
-
     head = addObjectToRenderList(head, player.thirdPersonView,&player.playerObject);
     head = addMapToRenderList(head,player.thirdPersonView,mapy);
 
-    /*RenderArray ra;
-    init_render_array(&ra,0);
-    add_Object_to_RenderArray(&ra, cam, &player.playerObject);
-    addMapToRenderArray(&ra, mapy, player.thirdPersonView);*/
-
-    double rot = 0;
-
+    Point last_position;
     double secsPerFrame = 1.0/50.0;
+    double time;
     bool keep_running = true;
+    bool is_game_won = false;
+
+    clock_t start = clock();
     while (keep_running) {
         clock_t start = clock();
-        double most = time(NULL);
         for(SDL_Event ev; SDL_PollEvent(&ev);) {
             if(ev.type == SDL_QUIT) {
                 keep_running = false;
@@ -117,116 +94,58 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
                     keep_running = false;
                 } else if (keycode == controls.forward) {
                     if (player.velocity <= 10)
-                        player.velocity++;
-                    printf("%.0lf\n", player.velocity);
+                        player.velocity += 0.25;
                 } else if (keycode == controls.backward) {
                     if (player.velocity > 0)
-                        player.velocity--;
+                        player.velocity -= 0.25;
                 } else if (keycode == controls.left) {
-                    player.direction += 1*degree;
-                    a = 1;
+                    player.direction += 5*degree;
                 } else if (keycode == controls.right) {
-                    player.direction += -1*degree;
-                    a = -1;
+                    player.direction += -5*degree;
                 }
-                /*switch (ev.key.keysym.sym) {
-                    case SDLK_UP:
-                        //printf("shit");
-                        z+=10;
-                        break;
-                    case SDLK_DOWN:
-                        z-=10;
-                        break;
-                    case SDLK_LEFT:
-                        x-=10;
-                        break;
-                    case SDLK_RIGHT:
-                        x+=10;
-                        break;
-                    case SDLK_m:
-                        y+=10;
-                        break;
-                    case SDLK_n:
-                        y-=10;
-                        break;
-                    case SDLK_u:
-                        a++;
-                        break;
-                    case SDLK_i:
-                        a--;
-                        break;
-                    case SDLK_z:
-                        b++;
-                        break;
-                    case SDLK_t:
-                        b--;
-                        break;
-                    case SDLK_r:
-                        c++;
-                        break;
-                    case SDLK_e:
-                        c--;
-                        break;
-                    case SDLK_ESCAPE:
-                        keep_running = false;
-                        break;
-                }*/
             }
         }
-        //player.velocity = 10;
-        clock_t cc = clock();
-        double deltaa = ((double) (cc - start) / CLOCKS_PER_SEC);
-        int a = 0;
-        //x = player.velocity*(cos(player.direction+M_PI/2.0));
-        //z = player.velocity*(sin(player.direction+M_PI/2.0));
-        //printf("x:%.0lf y:%.0lf , szög:%.2f\n",x,z, player.direction*degree);
 
-        /*if (rot < 360)
-            rot += 0.0001;
-        else
-            rot = 0;*/
+        Point car;
+        car.posX = player.location.posX;
+        car.posY = player.location.posY;
+        car.posZ = player.location.posZ;
 
-        //Kamera mozgatása a térben
-        /*if (point_inside_invis_walls(belso, player.location) || point_outside_invis_walls(kulso,player.location)) {
+        car.posY += 10;
 
-            //player.velocity = 0;
-            //printf("bent\n");
+        rotate_Point_around_Point(player.location,&car,0,player.direction,0);
+
+        if (point_inside_invis_walls(belso, player.location) || point_outside_invis_walls(kulso,player.location) || point_inside_invis_walls(belso, car) || point_outside_invis_walls(kulso, car)) {
+            player.velocity = 0;
+            player.location = last_position;
         } else {
-
-            //printf("kint\n");
-        }*//*else {
-            //player.location.posX += x;
-            //player.location.posY += y;
-            //player.location.posZ += z;
-            //printf("benn\n");
-        }*/
+            last_position.posX = player.location.posX;
+            last_position.posY = player.location.posY;
+            last_position.posZ = player.location.posZ;
+        }
 
         updatePlayer(&player);
 
+        Rect r = {692, 100, 298, 740, 100,298,692, 100, 300, 740, 100, 300};
+        if (checkWinCondition(player.location, r)){
+            keep_running = false;
+            is_game_won = true;
+        }
+
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
         SDL_RenderClear(renderer);
-
-        //rotate_Object_around_Point(player.playerObject.location, &player.playerObject,0,-a*degree,0);
         head = render_RList(head, player.thirdPersonView, renderer);
-
-        clock_t stop = clock();
-        double deltaClock = ((double) stop-start)/CLOCKS_PER_SEC;
-        //head = render_RList(head, cam, renderer);
-        //render_ra(&ra,player.thirdPersonView, renderer);
-
         SDL_RenderPresent(renderer);
-        //SDL_DestroyRenderer(renderer);
-
-        //usleep(secsPerFrame);
-        //SDL_Delay(secsPerFrame);
+        SDL_Delay(secsPerFrame);
     }
 
-    //print_invis(belso);
-    //free_model(&cube);
-    //free_object(&cube1);
+    clock_t stop = clock();
+    if (is_game_won) {
+        time = (((double) stop-start)/CLOCKS_PER_SEC);
+        printf("Time: %.3lf\n",(((double) stop-start)/CLOCKS_PER_SEC));
+        save_time(time,"map2.txt");
+    }
 
-    SDL_DestroyWindow(window);
 
     free_invis_wall(belso);
     free_invis_wall(kulso);
@@ -234,7 +153,6 @@ void startGame(SDL_Renderer *renderer, SDL_Window *window, int SCREEN_WIDTH, int
     free_object_list(mapy);
 
     free_player(&player);
-    //free_render_array(&ra);
 
     freeList(head);
 }

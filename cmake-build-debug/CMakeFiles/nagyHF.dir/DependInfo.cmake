@@ -10,6 +10,7 @@ set(CMAKE_DEPENDS_CHECK_C
   "/home/coldus/CLionProjects/nagyHF/menu.c" "/home/coldus/CLionProjects/nagyHF/cmake-build-debug/CMakeFiles/nagyHF.dir/menu.c.o"
   "/home/coldus/CLionProjects/nagyHF/object.c" "/home/coldus/CLionProjects/nagyHF/cmake-build-debug/CMakeFiles/nagyHF.dir/object.c.o"
   "/home/coldus/CLionProjects/nagyHF/player.c" "/home/coldus/CLionProjects/nagyHF/cmake-build-debug/CMakeFiles/nagyHF.dir/player.c.o"
+  "/home/coldus/CLionProjects/nagyHF/records.c" "/home/coldus/CLionProjects/nagyHF/cmake-build-debug/CMakeFiles/nagyHF.dir/records.c.o"
   "/home/coldus/CLionProjects/nagyHF/renderer.c" "/home/coldus/CLionProjects/nagyHF/cmake-build-debug/CMakeFiles/nagyHF.dir/renderer.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")

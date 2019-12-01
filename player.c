@@ -9,10 +9,21 @@
 #include <time.h>
 #include "renderer.h"
 
-//A pont és a vektor jelen esetbenkét egymással felcserélhető fogalom, a program pontnak hívja a játékos
-//irányvektorát is, pedig valójában az vektor, és akként és van kezelve.
+/*! A játékos struktúrája.
+ * Két kamera is van benne, ez azért van így, mert tervben volt az, hogy a két nézet között
+ * gombnyomással lehessen váltani, viszont sajnos ezt már nem sikerült implementálni, így a felülnézetes
+ * harmadik személyű néző pontot használja a játék.
+ * A playerObject az a játékos objektuma, azaz jelen esetben a kocsi, amivel megyünk.
+ * A velocity a kocsink sebessége.
+ * A direction a mozgás irányát szabja meg. Ez radiánban van, és a sebesség y körüli elforgatását jelenti valójában.
+ * A location a játékos pozícióját adja meg, és ez alapján frissítjük a kamerák helyzetét is.
+ * A third_person_dist azt szabja meg, hogy a felülnézetes kamera milyen messze van a kocsitól.
+ * */
 typedef struct Player{Camera firstPersonView; Camera thirdPersonView; Object playerObject; double velocity; double direction; Point location; double third_person_dist} Player;
 
+/*! A játékost valójában ez a függvény hozza létre,az inputok alapján, és rögtön megfelelő
+ * helyzetbe állítja a kamerákat.
+ * */
 Player initPlayer(Point playerLocation, double thirdPersonView_dist, char* path_to_player_model, int screen_width, int screen_height, double direction) {
     double degree = M_PI/180.0;
     Player new_player;
@@ -26,7 +37,6 @@ Player initPlayer(Point playerLocation, double thirdPersonView_dist, char* path_
     Object player_obj;
     player_obj.location = playerLocation;
     load_Model_into_Object(&player_obj, player_model, 0.5);
-    //rotate_Object_around_Point(player_obj.location, &player_obj, 0, 180*degree, 0);
 
     player_obj.angle_from_y_axis = 180*degree;
 
@@ -56,10 +66,11 @@ Player initPlayer(Point playerLocation, double thirdPersonView_dist, char* path_
     return new_player;
 }
 
+/*! A játékos iránya, sebessége alapján változtatja a játékos,
+ * és a kamerák pozicióját/irányát.
+ * */
 void updatePlayer(Player *play) {
-    clock_t start = clock();
     //A velocity-t egy (0,1)-es vektorként tekintve
-    //play->location.posX += play->velocity*
     play->location.posX += play->velocity*(-sin(play->direction));
     play->location.posZ += play->velocity*(cos(play->direction));
 
@@ -76,11 +87,6 @@ void updatePlayer(Player *play) {
         rotate_Object_around_Point(play->playerObject.location, &play->playerObject, 0, dAngle, 0);
         play->playerObject.angle_from_y_axis = play->direction;
     }
-    //rotate_Object_around_Point(play->playerObject.location, &play->playerObject,0,play->direction*(M_PI/180.0),0);
-
-    clock_t stop = clock();
-    double deltaClock = ((double) stop-start)/CLOCKS_PER_SEC;
-
 }
 
 void free_player(Player *player1) {

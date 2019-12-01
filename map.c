@@ -11,36 +11,77 @@
 //Debugmalloc:
 #include "debugmalloc-impl.h"
 #include "debugmalloc.h"
-
+/*! A map struktúra valójában egy objektumokat tartalmazó láncolt lista.
+ * Ez azért van így, mert amikor betöltünk egy pályát, akkor nem tudjuk elsőre, hogy
+ * hány objektuma van a pályának, és így egyszerűen hozzá tudunk adni a listához
+ * új objektumokat.
+ * */
 typedef struct object_list{Object obj; struct object_list *next} map;
+
+/*! Modeleket tartalmazó láncolt lista nem szerepelt a specifikációban,
+ * de szükség van rá, hiszen a programnak tudnia kell, hogy a pályán
+ * lévő objektumoknak hol találja a model fájlját, ami alapján
+ * ki tudja őket rajzolni.
+ *
+ * A struktúra tartalmazza a pályán megjelenő összes objektum modeljét, és a
+ * modelhez tartozó rövid, "hivatkozási nevet".
+ * A "hivatkozási név" az a név, ami a map fájlban szerepel az objektumok mellett.
+ * */
 typedef struct model_list{Model model; char name[50]; struct model_list *next} model_list;
+
+/*! Az invis_wall egy olyan struktúra, ami azért néz ki, és működik úgy, ahogy
+ * mert nem gondoltam rá időben.
+ *
+ * Erre a struktúrára valójában nem lenne szükség, és a kezelésére sem, viszont akkor
+ * a map fájl kezelése nem úgy nézne ki, mint ahogy az a specifikációban szerepel.
+ *
+ * Az invis_wall egy láncolt lista, melynek minden eleme tartalmaz két pontot,
+ * egy relatív helyzetet meghatározó pontot, amire azért van szükség, hogy
+ * ha műveletet szeretnénk a láthatatlan fallal csinálni, akkor el kell tolni
+ * azt az origóba, viszont ehhez ismerni kell azt, hogy hol van a fal...
+ * Ezért a lista összes eleme tartalmazza a láthatatlan fal középpontjának koordinátáit.
+ * A második pont a fal egyik pontja.
+ * Ennek a pontnak a fal jelenlegi műkédésének az esetében csak x, z koordinátákra van szükség.
+ *
+ * A láthatatlan fal úgy működik, hogy van egy n oldalú konvex sokszögünk (a síkban), amiről el lehet dönteni,
+ * hogy egy pont a sokszögön belül, vagy kívül helyezkedik el, és magát az n oldalú sokszöget tekintjük a
+ * láthatatlan falnak. Így ha egy pont nem ott van ahol lennie kellene (a sok szögön kívűl, vagy éppen belül)
+ * akkor "ütközés" történt, és átment a pont a láthatatlan falon.
+ * */
 typedef struct invis_wall{Point location; Point p; struct invis_wall* next; double size} invis_wall;
 
 //        Függvény, ami eldönti, hogy egy pont jobbra vagy balra van két másik pontoz képest (Jobb körüljárással)
 //----------------------------------------------------------------------------------------------------------------------
+/*! Ez a függvény felelős azért, hogy eldöntse egy pontról, hogy az egy egyenes
+ * fölött, vagy alatt helyezkedik el, vagy jelen esetben körüljárást tekintve, az
+ * egyenes jobb, vagy bal oldalán helyezkedik el.
+ *
+ * A függvény mögötti logika a következő: ha egy egyenes egyenletébe (0-ra rendezve) behelyettesítünk egy pontot, akkor
+ * ha az 0-nál kisebb, akkor az egyenes alatt van a pont, ha nagyobb, akkor felette van, és ha 0, akkor az
+ * egyenes egyik pontja a vizsgált pont.
+ *
+ * A jobb és bal oldalt pedig úgy vezettem be, hogy ha az első pont x koordinátája kisebb mint a másodiké, akkor bal
+ * oldalt van az a pont ami az egyenes felett van, és jobb, ha alatt.
+ * És ha ez nem igaz (az első pont x koordinátája nagyobb, mint a másodiké), akkor az a pont ami az egyenes fölött
+ * van, az az egyenestől jobbra van, és ami alatta van, az pedig balra van.
+ *
+ * Ez a függvény azért fontos, mert egy n oldalú konvex sokszög esetén ha egy pontot a sokszög minden oldalára vizsgálva
+ * mindig azt tapasztaljuk, hogy a pont az oldalak jobb oldalán van (jobb körüljárás esetén), akkor a pont a sokszögön
+ * belül van, más esetben pedig a sokszögön kívűl.
+ * */
 bool is_it_left(Point first, Point second, Point pointInQuestion) {
     if (first.posX != second.posX) {
         double m = ((double) second.posZ - first.posZ) / (double) (second.posX - first.posX);
-        //y-y1 = m(x-x1)
-        //mx1-y1=mx-y
-        //x,y eldontendo x és y-ja
-        //x1,y1 elso pont x és y-ja
         double konstans = m * first.posX - first.posZ;
         if (first.posX < second.posX) {
             if(konstans > (m * pointInQuestion.posX - pointInQuestion.posZ)) {
                 return false;
-            /*} else if (konstans == (m * pointInQuestion.posX - pointInQuestion.posZ)) {
-                //printf("benne van shit\n");
-                return true;*/
             } else {
                 return true;
             }
         } else {
             if(konstans < (m * pointInQuestion.posX - pointInQuestion.posZ)) {
                 return false;
-            /*} else if (konstans == (m * pointInQuestion.posX - pointInQuestion.posZ)) {
-                //printf("benne van shit\n");
-                return true;*/
             } else {
                 return true;
             }
@@ -90,11 +131,13 @@ void free_invis_wall(invis_wall* head) {
     }
 }
 
+/*! Az is_it_left függvény segítségével megvizsgálja, hogy egy pont (x,z koordinátákat figyelembe véve)
+ * a láthatatlan falon (mint sokszögön) belül van-e.
+ * */
 bool point_inside_invis_walls(invis_wall* head, Point p) {
     invis_wall* iter = head;
 
     while (iter != NULL) {
-        //printf("X: %.0lf Y: %.0lf Z: %.0lf",iter->p.posX,iter->p.posY, iter->p.posZ);
         if (iter->next != NULL) {
             if (!is_it_left(iter->p, iter->next->p, p))
                 return false;
@@ -107,12 +150,14 @@ bool point_inside_invis_walls(invis_wall* head, Point p) {
     return true;
 }
 
+/*! Ez a függvény tulajdonképpen ugyanazt csinálja, mint a point_inside_invis_walls, csak éppen az ellenkező
+ * esetben ad igazat.
+ * */
 bool point_outside_invis_walls(invis_wall* head, Point p) {
     invis_wall* iter = head;
     while (iter != NULL) {
         if (iter->next != NULL) {
             if (!is_it_left(iter->p, iter->next->p, p))
-                //printf("mé\n");
                 return true;
         } else {
             if (!is_it_left(iter->p, head->p, p))
@@ -123,6 +168,11 @@ bool point_outside_invis_walls(invis_wall* head, Point p) {
     return false;
 }
 
+/*! Ez a függvény beolvas egy láthatatlan falat egy fájlból.
+ * A láthatatlan fal fájlja úgy néz ki, hogy pontok x, z koordinátái vannak
+ * egymás mellett space-el elválasztva, soronként egy pont x, z koordinátái
+ * szerepelnek, bármi egyéb nélkül.
+ * */
 invis_wall* load_invis_wall_from_file(char* path, Point location, double size) {
     invis_wall* head = NULL;
     FILE *fp = fopen(path,"r");
@@ -137,11 +187,9 @@ invis_wall* load_invis_wall_from_file(char* path, Point location, double size) {
         char posx[20];
         char posz[20];
         sscanf(line, "%s %s", posx, posz);
-        //printf("%s %s\n",posx,posz);
         new_point.posY = 0;
         new_point.posX = strtod(posx,NULL);
         new_point.posZ = strtod(posz,NULL);
-        //printf("%.0lf %.0lf\n", new_point.posX, new_point.posZ);
 
         head = add_point_to_inviswall(head,new_point, location, size);
     }
@@ -199,7 +247,9 @@ void print_invis(invis_wall* head) {
 
 //                                             map függvényei
 //----------------------------------------------------------------------------------------------------------------------
-
+/*! A map láncolt listájához adja az új objektumot.
+ * Erre a függvényre a map fájl beolvasásánál van szükség.
+ * */
 map* add_object_to_map(map *head, Object obj) {
     map *newItem = (map*) malloc(sizeof(map));
     newItem->obj = obj;
@@ -220,7 +270,6 @@ void free_object_list(map *head) {
 
 //                                          model_list függvényei
 //----------------------------------------------------------------------------------------------------------------------
-
 model_list* add_to_model_list(model_list *head, char* name, Model model) {
     model_list *newItem = (model_list*) malloc(sizeof(model_list));
     newItem->model = model;
@@ -230,6 +279,10 @@ model_list* add_to_model_list(model_list *head, char* name, Model model) {
     return newItem;
 }
 
+/*! Beolvassa a model_list fájl-ból a modeleket, oly módon, hogy beolvassa a model "hivatkozási nevét"
+ * majd az útvonalat a model fájljához, és ezeket betölti a memóriban lévő model_list láncolt lista
+ * elemeibe.
+ * */
 model_list* load_model_list(char *path_to_location) {
     char line[200];
     FILE *fp = fopen(path_to_location,"r");
@@ -239,8 +292,6 @@ model_list* load_model_list(char *path_to_location) {
 
     while(fgets(line, sizeof(line), fp)) {
         Model model;
-        //char *name = (char*) malloc(50*sizeof(char));
-        //char *path = (char*) malloc(150*sizeof(char));
 
         sscanf(line, "%s %s", name, path);
         load_model_from_file(path, &model);
@@ -261,6 +312,9 @@ void free_model_list(model_list *head) {
     }
 }
 
+/*! Végig fut a láncolt listán, oly módon, hogy ellenőrzi, hogy a lista tartalmazza-e a keresett model
+ * hivatkozási nevét. Ha igen akkor true-val tér vissza, ha nem, akkor pedig false-al.
+ * */
 bool does_model_list_contain(model_list *head, char *name) {
     model_list *current = head;
     while (current != NULL) {
@@ -285,23 +339,21 @@ Model load_from_list(model_list *head, char *name) {
 
 //                                     Map betöltésének függvénye
 //----------------------------------------------------------------------------------------------------------------------
-
+/*! A fenti függvényeket használva a map fájlból betölti a pályát a gép memóriájába,
+ * és minden objektumot rögtön úgy ad hozzá a láncolt listához, hogy azok már
+ * a megfelelő koordinán helyezkednek el, és már megfelelően is vannak elforgatva.
+ * */
 map* load_map_from_file(char *filename, map *map, model_list modelList) {
     FILE *fp = fopen(filename, "r");
 
-    //char *string = (char*) malloc(200*sizeof(char));
-    //char *string = calloc(100, sizeof(char));
     char string[200];
     char name[50] = {0};
     char posX[50], posY[50], posZ[50], size[50], rotX[50], rotY[50], rotZ[50];
-    //double posX, posY, posZ, size, rotX, rotY, rotZ;
     int b;
 
     while(fgets(string, sizeof(string),fp) != NULL) {
         sscanf(string, "%s %s %s %s %s %s %s %s", name, posX, posY, posZ, size, rotX, rotY, rotZ);
-        //printf("%s\n",string);
         if (does_model_list_contain(&modelList, name)) {
-            //printf("positions: x: %s y: %s z: %s size: %s rotX: %s rotY: %s rotZ: %s\n", posX, posY, posZ, size, rotX, rotY, rotZ);
             Object obj;
             obj.location.posX = (double) strtol(posX, NULL, 10);
             obj.location.posY = (double) strtol(posY, NULL, 10);
@@ -315,7 +367,6 @@ map* load_map_from_file(char *filename, map *map, model_list modelList) {
         }
     }
 
-    //free(string);
     fclose(fp);
     return map;
 }
